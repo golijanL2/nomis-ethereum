@@ -1,0 +1,167 @@
+﻿@using Nomis.Utils.Constants
+@using Nomis.Web.Client.Common.Helpers
+
+@model Nomis.Utils.Wrapper.Result<Nomis.Etherscan.Interfaces.Models.EthereumWalletScore>
+
+@{
+    var score = Model.Data.Score;
+    var color = "#8f8f8f";
+    if (score > 0.25)
+    {
+        color = "#cf2b2b";
+    }
+    if (score > 0.50)
+    {
+        color = "#cfc62b";
+    }
+    if (score > 0.75)
+    {
+        color = "#57cf2b";
+    }
+}
+
+<div class="modal fade" id="messageModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="staticBackdropLabel">In development</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                We are currently developing a Non-Transferable Token with your score that can be used for decentralized approval of your score. Stay tuned we'll be finished soon :)
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary">OK</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+<h3 class="animate__animated animate__zoomIn m-3">@Application.Brand Score: <span style="color: @color">@score.ToString("P")
+</span>
+    <a href="https://twitter.com/share?ref_src=twsrc%5Etfw"
+       
+       class="twitter-share-button"
+       data-size="large"
+       data-text="Hey! Check out My Numus Score:"
+       data-show-count="false">Twitter</a></h3>
+<p>
+    <a class="button button-shadow" type="button" data-bs-toggle="collapse" data-bs-target="#detailTable" aria-expanded="false" aria-controls="detailTable">Show details</a>
+    <a class="button button-shadow button-primary" type="button" data-bs-toggle="modal" data-bs-target="#messageModal">Mint NFT with my Score</a>
+</p>
+@if (@Model.Succeeded && @Model.Data?.Stats?.NoData == false)
+{
+    <table class="table table-striped table-hover collapse mb-48" id="detailTable">
+        <thead>
+            <tr style="text-align-last: center;">
+                <th scope="col">#</th>
+                <th scope="col">Param</th>
+                <th scope="col">Value</th>
+                <th scope="col">Description</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <th scope="row">1</th>
+                <td>@nameof(Model.Data.Stats.WalletAge)</td>
+                <td>@Model.Data.Stats.WalletAge</td>
+                <td desc-for="Data.Stats.WalletAge"></td>
+            </tr>
+            <tr>
+                <th scope="row">2</th>
+                <td>@nameof(Model.Data.Stats.Balance)</td>
+                <td>@Model.Data.Stats.Balance.Round(6)</td>
+                <td desc-for="Data.Stats.Balance"></td>
+            </tr>
+            <tr>
+                <th scope="row">3</th>
+                <td>@nameof(Model.Data.Stats.WalletTurnover)</td>
+                <td>@Model.Data.Stats.WalletTurnover.Round()</td>
+                <td desc-for="Data.Stats.WalletTurnover"></td>
+            </tr>
+            <tr>
+                <th scope="row">4</th>
+                <td>@nameof(Model.Data.Stats.AverageTransactionTime)</td>
+                <td>@Model.Data.Stats.AverageTransactionTime.Round()</td>
+                <td desc-for="Data.Stats.AverageTransactionTime"></td>
+            </tr>
+            <tr>
+                <th scope="row">5</th>
+                <td>@nameof(Model.Data.Stats.MaxTransactionTime)</td>
+                <td>@Model.Data.Stats.MaxTransactionTime.Round()</td>
+                <td desc-for="Data.Stats.MaxTransactionTime"></td>
+            </tr>
+            <tr>
+                <th scope="row">6</th>
+                <td>@nameof(Model.Data.Stats.MinTransactionTime)</td>
+                <td>@Model.Data.Stats.MinTransactionTime.Round()</td>
+                <td desc-for="Data.Stats.MinTransactionTime"></td>
+            </tr>
+            <tr>
+                <th scope="row">7</th>
+                <td>@nameof(Model.Data.Stats.TotalTransactions)</td>
+                <td>@Model.Data.Stats.TotalTransactions</td>
+                <td desc-for="Data.Stats.TotalTransactions"></td>
+            </tr>
+            <tr>
+                <th scope="row">8</th>
+                <td>@nameof(Model.Data.Stats.TimeFromLastTransaction)</td>
+                <td>@Model.Data.Stats.TimeFromLastTransaction</td>
+                <td desc-for="Data.Stats.TimeFromLastTransaction"></td>
+            </tr>
+            <tr>
+                <th scope="row">9</th>
+                <td>@nameof(Model.Data.Stats.LastMonthTransactions)</td>
+                <td>@Model.Data.Stats.LastMonthTransactions</td>
+                <td desc-for="Data.Stats.LastMonthTransactions"></td>
+            </tr>
+            <tr>
+                <th scope="row">10</th>
+                <td>@nameof(Model.Data.Stats.TransactionsPerMonth)</td>
+                <td>@Model.Data.Stats.TransactionsPerMonth</td>
+                <td desc-for="Data.Stats.TransactionsPerMonth"></td>
+            </tr>
+            <tr>
+                <th scope="row">11</th>
+                <td>@nameof(Model.Data.Stats.NftHolding)</td>
+                <td>@Model.Data.Stats.NftHolding</td>
+                <td desc-for="Data.Stats.NftHolding"></td>
+            </tr>
+            <tr>
+                <th scope="row">12</th>
+                <td>@nameof(Model.Data.Stats.NftTrading)</td>
+                <td>@Model.Data.Stats.NftTrading.Round()</td>
+                <td desc-for="Data.Stats.NftTrading"></td>
+            </tr>
+            <tr>
+                <th scope="row">13</th>
+                <td>@nameof(Model.Data.Stats.NftWorth)</td>
+                <td>@Model.Data.Stats.NftWorth.Round()</td>
+                <td desc-for="Data.Stats.NftWorth"></td>
+            </tr>
+            
+            <tr>
+                <th scope="row">14</th>
+                <td>@nameof(Model.Data.Stats.TokensHolding)</td>
+                <td>@Model.Data.Stats.TokensHolding</td>
+                <td desc-for="Data.Stats.TokensHolding"></td>
+            </tr>
+            <tr>
+                <th scope="row">15</th>
+                <td>@nameof(Model.Data.Stats.DeployedContracts)</td>
+                <td>@Model.Data.Stats.DeployedContracts</td>
+                <td desc-for="Data.Stats.DeployedContracts"></td>
+            </tr>
+        </tbody>
+    </table>
+}
+else
+{
+    @foreach (var message in @Model.Messages ?? new List<string>())
+    {
+        <div class="alert alert-warning" role="alert">
+            @message
+        </div>
+    }
+}

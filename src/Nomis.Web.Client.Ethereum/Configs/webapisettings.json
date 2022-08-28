@@ -1,0 +1,5 @@
+{
+  "WebApiSettings": {
+    "ApiBaseUrl": "https://api.nomis.cc"
+  }
+}

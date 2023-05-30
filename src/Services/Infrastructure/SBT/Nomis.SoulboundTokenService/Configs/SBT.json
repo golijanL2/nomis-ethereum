@@ -1,0 +1,24 @@
+{
+  "SoulboundTokenSettings": {
+    "TokenImageApiBaseUrl": "https://nomis-image.vercel.app/",
+    "MetadataTokenName": "Nomis Score",
+    "MetadataTokenDescription": "Nomis is an open-source protocol that helps developers build better DeFi solutions and experiences.",
+    "MetadataTokenExternalUrl": "https://nomis.cc/tokens/",
+    "TokenData": {
+      "Finance": {
+        "0": {
+          "TokenName": "NMSS",
+          "Version": "0.1",
+          "SignerWalletPrivateKey": ""
+        }
+      },
+      "Token": {
+        "0": {
+          "TokenName": "NMSES",
+          "Version": "0.1",
+          "SignerWalletPrivateKey": ""
+        }
+      }
+    }
+  }
+}

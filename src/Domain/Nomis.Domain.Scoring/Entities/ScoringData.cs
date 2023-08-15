@@ -5,6 +5,9 @@
 // </copyright>
 // ------------------------------------------------------------------------------------------------------
 
+using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
+
 using Nomis.Domain.Abstractions;
 using Nomis.Domain.Contracts;
 using Nomis.Domain.Scoring.Events;
@@ -70,36 +73,45 @@ namespace Nomis.Domain.Scoring.Entities
         /// <summary>
         /// Request address.
         /// </summary>
+        [JsonInclude]
         public string RequestAddress { get; private set; }
 
         /// <summary>
         /// Resolved request address.
         /// </summary>
+        [JsonInclude]
         public string? ResolvedAddress { get; private set; }
 
         /// <summary>
         /// Scoring calculation model.
         /// </summary>
+        [JsonInclude]
         public ScoringCalculationModel CalculationModel { get; private set; }
 
         /// <summary>
         /// Raw request.
         /// </summary>
+        [JsonInclude]
+        [Column(TypeName = "jsonb")]
         public string? RawRequest { get; private set; }
 
         /// <summary>
         /// Blockchain id.
         /// </summary>
+        [JsonInclude]
         public ulong Blockchain { get; private set; }
 
         /// <summary>
         /// Score.
         /// </summary>
+        [JsonInclude]
         public double Score { get; private set; }
 
         /// <summary>
         /// Scoring stat data.
         /// </summary>
+        [JsonInclude]
+        [Column(TypeName = "jsonb")]
         public string StatData { get; private set; }
 
         #region IVersionableByEvent

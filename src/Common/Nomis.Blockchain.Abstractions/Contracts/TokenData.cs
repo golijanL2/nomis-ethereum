@@ -18,6 +18,27 @@ namespace Nomis.Blockchain.Abstractions.Contracts
     public class TokenData
     {
         /// <summary>
+        /// Initialize <see cref="TokenData"/>.
+        /// </summary>
+        public TokenData()
+        {
+        }
+
+        /// <summary>
+        /// Initialize <see cref="TokenData"/>.
+        /// </summary>
+        /// <param name="tokenData"><see cref="TokenData"/>.</param>
+        public TokenData(
+            TokenData tokenData)
+        {
+            Id = tokenData.Id;
+            Symbol = tokenData.Symbol;
+            Name = tokenData.Name;
+            Decimals = tokenData.Decimals;
+            LogoUri = tokenData.LogoUri;
+        }
+
+        /// <summary>
         /// Token id in the blockchain.
         /// </summary>
         [JsonPropertyName("id")]

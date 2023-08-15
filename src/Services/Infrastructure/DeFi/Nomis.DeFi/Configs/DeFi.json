@@ -1,6 +1,6 @@
 {
   "DeFiSettings": {
-    "ApiKey": "c9a6f969-3c51-4c2d-9231-b3431ee53803",
+    "ApiKey": "",
     "ApiBaseUrl": "https://public-api.de.fi/graphql"
   }
 }

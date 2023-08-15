@@ -47,14 +47,9 @@ namespace Nomis.Blockchain.Abstractions.Extensions
                 result += commonStats.CalculateScore(chainId, calculationModel);
             }
 
-            if (stats is IWalletNativeBalanceStats balanceStats)
+            if (stats is IWalletBalanceStats balanceStats)
             {
                 result += balanceStats.CalculateScore(chainId, calculationModel);
-            }
-
-            if (stats is IWalletTokenBalancesStats tokenBalancesStats)
-            {
-                result += tokenBalancesStats.CalculateScore(chainId, calculationModel);
             }
 
             if (stats is IWalletTransactionStats transactionStats)
@@ -70,6 +65,11 @@ namespace Nomis.Blockchain.Abstractions.Extensions
             if (stats is IWalletTokenStats tokenStats)
             {
                 result += tokenStats.CalculateScore(chainId, calculationModel);
+            }
+
+            if (stats is IWalletCounterpartiesStats counterpartiesStats)
+            {
+                result += counterpartiesStats.CalculateScore(chainId, calculationModel);
             }
 
             // add additional scores stored in wallet stats implementation class

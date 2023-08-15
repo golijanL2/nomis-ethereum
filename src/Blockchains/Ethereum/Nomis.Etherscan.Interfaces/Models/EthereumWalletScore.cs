@@ -36,6 +36,12 @@ namespace Nomis.Etherscan.Interfaces.Models
         public ScoreType ScoreType => ScoreType.Finance;
 
         /// <summary>
+        /// Migrate data.
+        /// </summary>
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public MigrationData? MigrationData { get; init; }
+
+        /// <summary>
         /// Mint data.
         /// </summary>
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
@@ -46,6 +52,18 @@ namespace Nomis.Etherscan.Interfaces.Models
         /// </summary>
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public DIDData? DIDData { get; init; }
+
+        /// <summary>
+        /// Referral code.
+        /// </summary>
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public string? ReferralCode { get; init; }
+
+        /// <summary>
+        /// Referrer code.
+        /// </summary>
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public string? ReferrerCode { get; init; }
 
         /// <summary>
         /// Additional stat data used in score calculations.

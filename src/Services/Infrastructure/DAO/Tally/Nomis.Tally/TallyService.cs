@@ -187,7 +187,7 @@ namespace Nomis.Tally
             {
                 Converters = { new BigIntegerConverter() }
             }) !);
-            return await Result<TallyAccount?>.SuccessAsync(accounts?.Any() != true ? null : accounts.FirstOrDefault(a => a.Id?.Equals($"eip155:{request.ChainId}:{request.Address}", StringComparison.InvariantCultureIgnoreCase) == true), "Account data received.").ConfigureAwait(false);
+            return await Result<TallyAccount?>.SuccessAsync(accounts?.Any() != true ? null : accounts.Find(a => a.Id?.Equals($"eip155:{request.ChainId}:{request.Address}", StringComparison.InvariantCultureIgnoreCase) == true), "Account data received.").ConfigureAwait(false);
         }
     }
 }

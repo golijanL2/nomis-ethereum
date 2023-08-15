@@ -18,6 +18,6 @@ namespace Nomis.Greysafe.Settings
         /// <summary>
         /// Greysafe API URL.
         /// </summary>
-        public string? ApiBaseUrl { get; set; }
+        public string? ApiBaseUrl { get; init; }
     }
 }

@@ -19,16 +19,16 @@ namespace Nomis.DexProviderService.Settings
         /// <summary>
         /// Use caching.
         /// </summary>
-        public bool UseCaching { get; set; }
+        public bool UseCaching { get; init; }
 
         /// <summary>
         /// Cache sliding expiration time.
         /// </summary>
-        public TimeSpan CacheSlidingExpiration { get; set; }
+        public TimeSpan CacheSlidingExpiration { get; init; }
 
         /// <summary>
         /// List of tokens providers.
         /// </summary>
-        public IList<TokensProviderData> TokensProviders { get; set; } = new List<TokensProviderData>();
+        public IList<TokensProviderData> TokensProviders { get; init; } = new List<TokensProviderData>();
     }
 }

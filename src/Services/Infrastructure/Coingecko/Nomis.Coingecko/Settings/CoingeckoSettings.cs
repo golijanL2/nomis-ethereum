@@ -21,6 +21,6 @@ namespace Nomis.Coingecko.Settings
         /// <remarks>
         /// <see href="https://www.coingecko.com/en/api/documentation"/>
         /// </remarks>
-        public string? ApiBaseUrl { get; set; }
+        public string? ApiBaseUrl { get; init; }
     }
 }

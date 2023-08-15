@@ -7,7 +7,6 @@
 
 using System.Net.Mime;
 
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -68,7 +67,6 @@ namespace Nomis.Api.PolygonId
         /// <response code="404">No data found.</response>
         /// <response code="500">Unknown internal error.</response>
         [HttpGet("issuer/identities", Name = "PolygonIdIdentities")]
-        [AllowAnonymous]
         [SwaggerOperation(
             OperationId = "PolygonIdIdentities",
             Tags = new[] { PolygonIdTag })]
@@ -100,7 +98,6 @@ namespace Nomis.Api.PolygonId
         /// <response code="404">No data found.</response>
         /// <response code="500">Unknown internal error.</response>
         [HttpGet("issuer/{did}/claims/{cid}", Name = "PolygonIdClaim")]
-        [AllowAnonymous]
         [SwaggerOperation(
             OperationId = "PolygonIdClaim",
             Tags = new[] { PolygonIdTag })]
@@ -134,7 +131,6 @@ namespace Nomis.Api.PolygonId
         /// <response code="404">No data found.</response>
         /// <response code="500">Unknown internal error.</response>
         [HttpGet("issuer/{did}/claims/{cid}/qrcode", Name = "PolygonIdClaimQr")]
-        [AllowAnonymous]
         [SwaggerOperation(
             OperationId = "PolygonIdClaimQr",
             Tags = new[] { PolygonIdTag })]

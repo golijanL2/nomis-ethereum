@@ -31,6 +31,11 @@ namespace Nomis.Blockchain.Abstractions.Enums
         /// <summary>
         /// DefiLLama.
         /// </summary>
-        DefiLLama
+        DefiLLama,
+
+        /// <summary>
+        /// LayerZero (L0).
+        /// </summary>
+        LayerZero
     }
 }

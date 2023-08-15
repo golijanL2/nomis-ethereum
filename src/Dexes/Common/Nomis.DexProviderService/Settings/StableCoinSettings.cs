@@ -19,6 +19,6 @@ namespace Nomis.DexProviderService.Settings
         /// <summary>
         /// List of stablecoins data.
         /// </summary>
-        public IList<StableCoinData> Stablecoins { get; set; } = new List<StableCoinData>();
+        public IList<StableCoinData> Stablecoins { get; init; } = new List<StableCoinData>();
     }
 }

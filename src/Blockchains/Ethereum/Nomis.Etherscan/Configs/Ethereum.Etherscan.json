@@ -1,9 +1,14 @@
 {
   "EtherscanSettings": {
-    "ApiKey": "XSSGTSDUUWY49UVZREPN7VSZ842WWRFYQD",
+    "ApiKeys": [
+      ""
+    ],
+    "ApiBaseUrl": "https://api.etherscan.io/",
+    "MaxApiCallsPerSecond": 5,
     "BlockchainProviderUrl": "https://eth-mainnet.alchemyapi.io/v2/yindO_Z3YZ0ncbtpJmNG7WQfHO2RPcF4",
     "BlockchainDescriptors": {
       "Mainnet": {
+        "IsTestnet": false,
         "IsEnabled": true,
         "ChainId": 1,
         "ChainName": "Ethereum Mainnet",
@@ -22,12 +27,13 @@
         "Order": 1,
         "Icon": "https://defiyield-static.s3.eu-central-1.amazonaws.com/chains/eth.png",
         "LabelIcon": "https://defiyield-static.s3.eu-central-1.amazonaws.com/chains/eth-label.png",
-        "Enabled": true,
+        "IsHided": false,
         "Type": "EVM",
         "PlatformIds": {
           "Coingecko": "ethereum",
           "Debank": "eth",
-          "DefiLLama": "ethereum"
+          "DefiLLama": "ethereum",
+          "LayerZero": "101"
         },
         "RPCUrls": [
           "https://eth.llamarpc.com",
@@ -47,6 +53,7 @@
         "SBTData": null
       },
       "Testnet": {
+        "IsTestnet": true,
         "IsEnabled": true,
         "ChainId": 5,
         "ChainName": "Ethereum Mainnet",
@@ -65,12 +72,13 @@
         "Order": 1,
         "Icon": "https://defiyield-static.s3.eu-central-1.amazonaws.com/chains/eth.png",
         "LabelIcon": "https://defiyield-static.s3.eu-central-1.amazonaws.com/chains/eth-label.png",
-        "Enabled": true,
+        "IsHided": false,
         "Type": "EVM",
         "PlatformIds": {
           "Coingecko": "ethereum",
           "Debank": "eth",
-          "DefiLLama": "ethereum"
+          "DefiLLama": "ethereum",
+          "LayerZero": "101"
         },
         "RPCUrls": [
           "https://rpc.ankr.com/eth_goerli",
@@ -92,6 +100,211 @@
           }
         }
       }
+    },
+    "GetFromCacheStatsIsEnabled": true,
+    "GetFromCacheStatsTimeLimit": "00:15:00",
+    "UseHttpClientLogging": false,
+    "UseHistoricalMedianBalanceUSD": {
+      "CommonV3": true
+    },
+    "MedianBalancePrecision": 0,
+    "MedianBalanceStartFrom": "30.00:00:00",
+    "MedianBalanceLastCount": 1000,
+    "CounterpartiesFilterData": {
+      "LayerZero": [
+        {
+          "UseCounterparty": true,
+          "IsONFT": false,
+          "Name": "LayerZero",
+          "ContractName": "Endpoint",
+          "Description": "The omnichain contract for sending messages.",
+          "ContractAddress": "0x66A71Dcef29A0fFBDBE3c6a460a3B5BC225Cd675"
+        },
+        {
+          "UseCounterparty": true,
+          "IsONFT": false,
+          "Name": "LayerZero",
+          "ContractName": "Relayer v2",
+          "Description": "Relayer for the protocol.",
+          "ContractAddress": "0x902f09715b6303d4173037652fa7377e5b98089e"
+        },
+        {
+          "UseCounterparty": true,
+          "IsONFT": false,
+          "Name": "Testnet Bridge",
+          "ContractName": "SwappableBridge",
+          "Description": "Bridge for testnet tokens.",
+          "ContractAddress": "0x0A9f824C05A74F577A536A8A0c673183a872Dff4"
+        },
+        {
+          "UseCounterparty": true,
+          "IsONFT": false,
+          "Name": "Stargate Finance",
+          "ContractName": "Router",
+          "Description": "Core Stargate contract.",
+          "ContractAddress": "0x8731d54E9D02c286767d56ac03e8037C07e01e98"
+        },
+        {
+          "UseCounterparty": true,
+          "IsONFT": false,
+          "Name": "Stargate Finance",
+          "ContractName": "RouterETH",
+          "Description": "Core Stargate contract. This is currently used by the frontend.",
+          "ContractAddress": "0x150f94B44927F078737562f0fcF3C95c01Cc2376"
+        },
+        {
+          "UseCounterparty": true,
+          "IsONFT": false,
+          "Name": "Stargate Finance",
+          "ContractName": "*RouterETH",
+          "Description": "Core Stargate contract. This router can swap with payload.",
+          "ContractAddress": "0xb1b2eeF380f21747944f46d28f683cD1FBB4d03c"
+        },
+        {
+          "UseCounterparty": true,
+          "IsONFT": false,
+          "Name": "Stargate Finance",
+          "ContractName": "Bridge",
+          "Description": "Core Stargate contract.",
+          "ContractAddress": "0x296F55F8Fb28E498B858d0BcDA06D955B2Cb3f97"
+        },
+        {
+          "UseCounterparty": true,
+          "IsONFT": false,
+          "Name": "Stargate Finance",
+          "ContractName": "",
+          "Description": "Core Stargate contract.",
+          "ContractAddress": ""
+        },
+        {
+          "UseCounterparty": true,
+          "IsONFT": false,
+          "Name": "Stargate Finance",
+          "ContractName": "WidgetSwap",
+          "Description": "Core Stargate contract.",
+          "ContractAddress": "0x76d4d68966728894961AA3DDC1d5B0e45668a5A6"
+        },
+        {
+          "UseCounterparty": true,
+          "IsONFT": false,
+          "Name": "Angle Protocol",
+          "ContractName": "LayerZero agEUR Bridge Contract",
+          "Description": "Contract to be deployed on Ethereum for bridging an AgToken using a bridge intermediate token and LayerZero.",
+          "ContractAddress": "0x4Fa745FCCC04555F2AFA8874cd23961636CdF982"
+        },
+        {
+          "UseCounterparty": true,
+          "IsONFT": false,
+          "Name": "Angle Protocol",
+          "ContractName": "LayerZero ANGLE Bridge Contract",
+          "Description": "Contract to be deployed on Ethereum for bridging an ERC20 token (ANGLE for instance) using a bridge intermediate token and LayerZero.",
+          "ContractAddress": "0x1056178977457A5F4BE33929520455A7d2E28670"
+        },
+        {
+          "UseCounterparty": true,
+          "IsONFT": false,
+          "Name": "BTC.B",
+          "ContractName": "BTCbOFT",
+          "Description": "BTC.b Bridging OFT Contract.",
+          "ContractAddress": "0x2297aEbD383787A160DD0d9F71508148769342E3"
+        },
+        {
+          "UseCounterparty": true,
+          "IsONFT": false,
+          "Name": "Liquidswap Bridge",
+          "ContractName": "TokenBridge",
+          "Description": "Token Bridge contract.",
+          "ContractAddress": "0x50002CdFe7CCb0C41F519c6Eb0653158d11cd907"
+        },
+        {
+          "UseCounterparty": true,
+          "IsONFT": false,
+          "Name": "OlympusDAO",
+          "ContractName": "CrossChainBridge",
+          "Description": "CrossChain Bridge contract.",
+          "ContractAddress": "0x45e563c39cDdbA8699A90078F42353A57509543a"
+        },
+        {
+          "UseCounterparty": true,
+          "IsONFT": false,
+          "Name": "OmniSwap",
+          "ContractName": "SoDiamond",
+          "Description": "Contract for swapping between EVM chains.",
+          "ContractAddress": "0x2967E7Bb9DaA5711Ac332cAF874BD47ef99B3820"
+        },
+        {
+          "UseCounterparty": true,
+          "IsONFT": false,
+          "Name": "Interport Finance",
+          "ContractName": "ActionExecutor",
+          "Description": "Executor contract.",
+          "ContractAddress": "0x7b2E3FC7510D1A51b3bef735F985446589219354"
+        },
+        {
+          "UseCounterparty": true,
+          "IsONFT": false,
+          "Name": "Rango",
+          "ContractName": "StargateMiddleware",
+          "Description": "Stargate middleware contract.",
+          "ContractAddress": "0xEA05150d6e257736B8035CE3416F6a3cdFDEe936"
+        },
+        {
+          "UseCounterparty": true,
+          "IsONFT": false,
+          "Name": "WOOFi",
+          "ContractName": "CrosswapRouter",
+          "Description": "WOOFi CrossChain router V2.",
+          "ContractAddress": "0x9D1A92e601db0901e69bd810029F2C14bCCA3128"
+        },
+        {
+          "UseCounterparty": true,
+          "IsONFT": false,
+          "Name": "Altitude",
+          "ContractName": "Bridge",
+          "Description": "Altitude Bridge contract.",
+          "ContractAddress": "0xF80E51AFb613D764FA61751Affd3313C190A86BB"
+        },
+        {
+          "UseCounterparty": true,
+          "IsONFT": true,
+          "Name": "Polyhedra zkBridge",
+          "ContractName": "NFT721Bridge",
+          "Description": "Polyhedra ERC-721 zkBridge contract.",
+          "ContractAddress": "0x1e40CD8569F3c91F5101d54AE01a75574a9ccE60"
+        },
+        {
+          "UseCounterparty": true,
+          "IsONFT": false,
+          "Name": "SushiSwap",
+          "ContractName": "SushiXSwap",
+          "Description": "Crosschain AMM contract.",
+          "ContractAddress": "0x011E52E4E40CF9498c79273329E8827b21E2e581"
+        },
+        {
+          "UseCounterparty": true,
+          "IsONFT": true,
+          "Name": "Holograph",
+          "ContractName": "Holographer",
+          "Description": "Holograph contract.",
+          "ContractAddress": "0x3b2d8bb062D121619aCff4e01eCe2690789E919f"
+        },
+        {
+          "UseCounterparty": true,
+          "IsONFT": false,
+          "Name": "Harmony Bridge",
+          "ContractName": "ProxyERC20",
+          "Description": "Harmony bridge contract.",
+          "ContractAddress": "0x1Edb8BdeD80E1b87eD19EE7D97Ee80B4fDb615c1"
+        },
+        {
+          "UseCounterparty": true,
+          "IsONFT": false,
+          "Name": "COREDAO Bridge",
+          "ContractName": "OriginalTokenBridge",
+          "Description": "COREDAO bridge contract.",
+          "ContractAddress": "0x52e75D318cFB31f9A2EdFa2DFee26B161255B233"
+        }
+      ]
     }
   }
 }

@@ -32,7 +32,7 @@ namespace Nomis.Tatum
         {
             _client = new()
             {
-                BaseAddress = new(tatumOptions.Value.ApiBaseUrl ?? throw new ArgumentNullException(nameof(tatumOptions.Value.ApiBaseUrl)))
+                BaseAddress = new(tatumOptions.Value.ApiBaseUrl ?? "https://api.tatum.io/")
             };
             _client.DefaultRequestHeaders.Add("x-api-key", tatumOptions.Value.ApiKey);
         }

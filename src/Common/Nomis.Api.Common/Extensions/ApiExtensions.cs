@@ -5,19 +5,16 @@
 // </copyright>
 // ------------------------------------------------------------------------------------------------------
 
-using AspNetCoreRateLimit;
-using AspNetCoreRateLimit.Redis;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Mvc.ApplicationParts;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Nomis.Api.Common.Providers;
-using Nomis.Api.Common.Settings;
 using Nomis.Api.Common.Swagger.Filters;
 using Nomis.ScoringService.Interfaces.Builder;
 using Nomis.Utils.Contracts.Common;
 using Nomis.Utils.Contracts.Services;
-using Nomis.Utils.Extensions;
 using Serilog;
 using Swashbuckle.AspNetCore.SwaggerGen;
 
@@ -95,6 +92,20 @@ namespace Nomis.Api.Common.Extensions
         }
 
         /// <summary>
+        /// Add custom health checks.
+        /// </summary>
+        /// <param name="builder"><see cref="IHealthChecksBuilder"/>.</param>
+        /// <param name="configuration"><see cref="IConfiguration"/>.</param>
+        /// <returns>Returns <see cref="IHealthChecksBuilder"/>.</returns>
+        public static IHealthChecksBuilder AddCustomHealthChecks(
+            this IHealthChecksBuilder builder,
+            IConfiguration configuration)
+        {
+            return builder
+                .AddNpgSql(configuration.GetConnectionString("NomisDb") !, failureStatus: HealthStatus.Unhealthy);
+        }
+
+        /// <summary>
         /// Adds all config files to <see cref="IConfigurationBuilder"/> as JSON config source.
         /// </summary>
         /// <param name="builder"><see cref="IConfigurationBuilder"/>.</param>
@@ -110,42 +121,6 @@ namespace Nomis.Api.Common.Extensions
             var addJsonFileDelegate = new AddConfigFileDelegate(builder.AddJsonFile);
             AddConfigFiles(relativePath, filenamePattern, addJsonFileDelegate, includeOnlyForCurrentEnvironment);
             return builder;
-        }
-
-        /// <summary>
-        /// Adds rate limiting.
-        /// </summary>
-        /// <param name="services"><see cref="IServiceCollection"/>.</param>
-        /// <param name="configuration"><see cref="IConfiguration"/>.</param>
-        /// <returns>Returns <see cref="IServiceCollection"/>.</returns>
-        public static IServiceCollection AddRateLimiting(
-            this IServiceCollection services,
-            IConfiguration configuration)
-        {
-            services.AddSettings<ApiCommonSettings>(configuration);
-            var settings = configuration.GetSettings<ApiCommonSettings>();
-            if (settings.UseRateLimiting)
-            {
-                // TODO - add "X-Client" header by some logic
-                services
-                    .Configure<IpRateLimitOptions>(configuration.GetSection("IpRateLimiting"))
-                    .Configure<IpRateLimitPolicies>(configuration.GetSection("IpRateLimitPolicies"))
-
-                    // .Configure<ClientRateLimitOptions>(configuration.GetSection("ClientRateLimiting"))
-                    // .Configure<ClientRateLimitPolicies>(configuration.GetSection("ClientRateLimitPolicies"))
-                    .AddSingleton<IRateLimitConfiguration, RateLimitConfiguration>()
-                    .AddInMemoryRateLimiting();
-
-                if (settings.UseRedisCaching)
-                {
-                    services
-                        .AddDistributedRateLimiting<AsyncKeyLockProcessingStrategy>()
-                        .AddDistributedRateLimiting<RedisProcessingStrategy>()
-                        .AddRedisRateLimiting();
-                }
-            }
-
-            return services;
         }
 
         /// <summary>

@@ -41,17 +41,17 @@ namespace Nomis.Dex.Abstractions.Contracts
             {
                 if (!string.IsNullOrWhiteSpace(endpoint?.FactoryAddress))
                 {
-                    FactoryAddressUrl = $"{BlockсhainDescriptor?.BlockExplorerUrls.First()}address/{endpoint.FactoryAddress}";
+                    FactoryAddressUrl = $"{BlockсhainDescriptor?.BlockExplorerUrls[0]}address/{endpoint.FactoryAddress}";
                 }
 
                 if (!string.IsNullOrWhiteSpace(endpoint?.RouterAddress))
                 {
-                    RouterAddressUrl = $"{BlockсhainDescriptor?.BlockExplorerUrls.First()}address/{endpoint.RouterAddress}";
+                    RouterAddressUrl = $"{BlockсhainDescriptor?.BlockExplorerUrls[0]}address/{endpoint.RouterAddress}";
                 }
 
                 if (!string.IsNullOrWhiteSpace(endpoint?.OracleAddress))
                 {
-                    OracleAddressUrl = $"{BlockсhainDescriptor?.BlockExplorerUrls.First()}address/{endpoint.OracleAddress}";
+                    OracleAddressUrl = $"{BlockсhainDescriptor?.BlockExplorerUrls[0]}address/{endpoint.OracleAddress}";
                 }
             }
         }

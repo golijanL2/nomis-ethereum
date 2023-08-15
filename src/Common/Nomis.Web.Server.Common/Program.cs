@@ -6,13 +6,12 @@
 // ------------------------------------------------------------------------------------------------------
 
 using System.Reflection;
-
-using AspNetCoreRateLimit;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Nomis.Aave;
 using Nomis.Api.Aave.Extensions;
 using Nomis.Api.BalanceChecker.Extensions;
+using Nomis.Api.Blockscout.Extensions;
 using Nomis.Api.Ceramic.Extensions;
 using Nomis.Api.Chainanalysis.Extensions;
 using Nomis.Api.Common.Extensions;
@@ -27,12 +26,15 @@ using Nomis.Api.Ethereum.Extensions;
 using Nomis.Api.Greysafe.Extensions;
 using Nomis.Api.Hapi.Extensions;
 using Nomis.Api.IPFS.Extensions;
+using Nomis.Api.MailServices.Extensions;
 using Nomis.Api.PolygonId.Extensions;
 using Nomis.Api.Snapshot.Extensions;
 using Nomis.Api.SoulboundToken.Extensions;
 using Nomis.Api.Tally.Extensions;
 using Nomis.Api.Tatum.Extensions;
 using Nomis.BalanceChecker;
+using Nomis.Blockchain.Abstractions.Settings;
+using Nomis.Blockscout;
 using Nomis.CacheProviderService.Extensions;
 using Nomis.Ceramic;
 using Nomis.Chainanalysis;
@@ -40,15 +42,19 @@ using Nomis.Coingecko.Extensions;
 using Nomis.CurrentUserService.Extensions;
 using Nomis.CyberConnect;
 using Nomis.DataAccess.PostgreSql.Extensions;
+using Nomis.DataAccess.PostgreSql.Referral.Extensions;
 using Nomis.DataAccess.PostgreSql.Scoring.Extensions;
 using Nomis.DeFi;
 using Nomis.DefiLlama;
 using Nomis.DexProviderService;
+using Nomis.Domain;
+using Nomis.ElasticMailServices;
 using Nomis.Etherscan;
 using Nomis.Greysafe;
 using Nomis.HapiExplorer;
 using Nomis.IPFS;
 using Nomis.PolygonId;
+using Nomis.ReferralService.Extensions;
 using Nomis.ScoringService.Extensions;
 using Nomis.Snapshot;
 using Nomis.SoulboundTokenService;
@@ -69,17 +75,26 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Configuration
     .AddJsonFiles()
-    .AddEnvironmentVariables();
+    .AddEnvironmentVariables()
+    .AddUserSecrets<PolygonIdApi>()
+    .AddUserSecrets<IPFS>()
+    .AddUserSecrets<EvmScoreSoulboundToken>();
 
 builder.Services
     .AddHttpContextAccessor()
     .AddCache(builder.Configuration)
-    .AddRateLimiting(builder.Configuration)
+    .AddResponseCompression(options =>
+    {
+        options.EnableForHttps = true;
+    })
+    .AddSettings<BlacklistSettings>(builder.Configuration)
     .AddCurrentUserService()
     .AddApplicationPersistence(builder.Configuration)
     .AddScoringPersistence(builder.Configuration)
+    .AddReferralPersistence(builder.Configuration)
     .AddUSDConverter()
-    .AddScoringService();
+    .AddScoringService()
+    .AddReferralService();
 
 var scoringOptions = builder.ConfigureScoringOptions()
     .WithIPFSService<IPFS>()
@@ -96,9 +111,12 @@ var scoringOptions = builder.ConfigureScoringOptions()
     .WithHAPIProtocol<HapiExplorer>()
     .WithGreysafeService<Greysafe>()
     .WithChainanalysisService<Chainanalysis>()
-    .WithEvmSoulboundTokenService<EvmSoulboundToken>()
+    .WithNonEvmSoulboundTokenService<NonEvmScoreSoulboundToken>()
+    .WithEvmSoulboundTokenService<EvmScoreSoulboundToken>()
+    .WithBlockscoutAPI<BlockscoutApi>()
     .WithEthereumBlockchain<Etherscan>()
     .WithDexAggregator<DexProviderRegistrar>()
+    .WithMailService<ElasticMail>()
     .Build();
 
 builder.Services
@@ -109,15 +127,30 @@ builder.Services
         config.ReportApiVersions = true;
     });
 
-builder.Services.AddCors(options =>
+builder.Services.AddSettings<CorsSettings>(builder.Configuration);
+var corsSettings = builder.Configuration.GetSettings<CorsSettings>();
+if (corsSettings.UseCORS)
 {
-    options.AddDefaultPolicy(policy =>
+    builder.Services.AddCors(options =>
     {
-        policy.AllowAnyOrigin();
-        policy.WithMethods("GET", "OPTIONS");
-        policy.AllowAnyHeader();
+        options.AddDefaultPolicy(policy =>
+        {
+            policy.AllowAnyOrigin();
+            policy.WithMethods("GET", "OPTIONS");
+            policy.AllowAnyHeader();
+        });
+
+        foreach (var policyOrigins in corsSettings.PolicyOrigins)
+        {
+            options.AddPolicy(policyOrigins.Key, policy =>
+            {
+                policy.WithOrigins(policyOrigins.Value.ToArray());
+                policy.WithMethods("GET", "OPTIONS");
+                policy.AllowAnyHeader();
+            });
+        }
     });
-});
+}
 
 builder.Services.AddControllers()
     .ConfigureApiBehaviorOptions(options =>
@@ -135,7 +168,7 @@ builder.Services.AddSingleton<ExceptionHandlingMiddleware>();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
 {
-    #region Add xml-commånts
+    #region Add xml-comments
 
     var xmlPathes = new List<string>();
     string baseDirectory = AppDomain.CurrentDomain.BaseDirectory;
@@ -176,7 +209,7 @@ builder.Services.AddSwaggerGen(options =>
         }
     });
 
-    #endregion Add xml-commånts
+    #endregion Add xml-comments
 
     options.SwaggerDoc("v1", new()
     {
@@ -209,7 +242,7 @@ builder.Services.AddSwaggerGen(options =>
             .ToList();
 
         return versions?.Any(v => string.Equals($"v{v}", version, StringComparison.OrdinalIgnoreCase)) == true
-               && (maps.Count == 0 || maps.Any(v => string.Equals($"v{v}", version, StringComparison.OrdinalIgnoreCase)));
+               && (maps.Count == 0 || maps.Exists(v => string.Equals($"v{v}", version, StringComparison.OrdinalIgnoreCase)));
     });
 
     #endregion Add Versioning
@@ -233,16 +266,23 @@ if (apiCommonSettings.UseSwaggerCaching)
     builder.Services.Replace(ServiceDescriptor.Transient<ISwaggerProvider, CachingSwaggerProvider>());
 }
 
-builder.Services.AddHealthChecks();
+builder.Services
+    .AddHealthChecks()
+    .AddCustomHealthChecks(builder.Configuration);
 
 builder.Host.UseSerilog((context, configuration) =>
 {
     configuration.ReadFrom.Configuration(context.Configuration);
 });
-
 var app = builder.Build();
 
-app.UseIpRateLimiting();
+using var serviceScope = app.Services.CreateScope();
+foreach (var initializer in serviceScope.ServiceProvider.GetServices<IDatabaseSeeder>())
+{
+    initializer.Initialize();
+}
+
+app.UseResponseCompression();
 
 app.UseSerilogRequestLogging(options =>
 {
@@ -264,7 +304,7 @@ app.UseSwaggerUI(options =>
     options.DocumentTitle = "Nomis Score API V1";
     options.DefaultModelsExpandDepth(0);
 
-    options.InjectStylesheet("/css/swagger.css");
+    options.InjectStylesheet("../css/swagger.css");
     options.DisplayRequestDuration();
     options.DocExpansion(DocExpansion.None);
 
@@ -274,14 +314,19 @@ app.UseSwaggerUI(options =>
 });
 
 app.UseHttpsRedirection();
-app.UseCors();
+
+if (corsSettings.UseCORS)
+{
+    app.UseCors();
+}
+
 app.UseAuthorization();
 
 app.MapControllers();
 
 try
 {
-    app.Run();
+    await app.RunAsync().ConfigureAwait(false);
 }
 catch (Exception e)
 {
@@ -290,5 +335,5 @@ catch (Exception e)
 finally
 {
     Log.Information("Server Shutting down...");
-    Log.CloseAndFlush();
+    await Log.CloseAndFlushAsync().ConfigureAwait(false);
 }

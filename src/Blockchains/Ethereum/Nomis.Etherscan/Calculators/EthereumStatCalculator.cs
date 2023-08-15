@@ -7,7 +7,6 @@
 
 using System.Numerics;
 
-using EthScanNet.Lib.Models.ApiResponses.Accounts.Models;
 using Nomis.Aave.Interfaces.Calculators;
 using Nomis.Aave.Interfaces.Responses;
 using Nomis.Blockchain.Abstractions.Calculators;
@@ -42,8 +41,7 @@ namespace Nomis.Etherscan.Calculators
     /// </summary>
     internal sealed class EthereumStatCalculator :
         IWalletCommonStatsCalculator<EthereumWalletStats, EthereumTransactionIntervalData>,
-        IWalletNativeBalanceStatsCalculator<EthereumWalletStats, EthereumTransactionIntervalData>,
-        IWalletTokenBalancesStatsCalculator<EthereumWalletStats, EthereumTransactionIntervalData>,
+        IWalletBalanceStatsCalculator<EthereumWalletStats, EthereumTransactionIntervalData>,
         IWalletTransactionStatsCalculator<EthereumWalletStats, EthereumTransactionIntervalData>,
         IWalletTokenStatsCalculator<EthereumWalletStats, EthereumTransactionIntervalData>,
         IWalletContractStatsCalculator<EthereumWalletStats, EthereumTransactionIntervalData>,
@@ -57,11 +55,13 @@ namespace Nomis.Etherscan.Calculators
         IWalletDexTokenSwapPairsStatsCalculator<EthereumWalletStats, EthereumTransactionIntervalData>,
         IWalletHapiStatsCalculator<EthereumWalletStats, EthereumTransactionIntervalData>
     {
+        private readonly decimal _tokenUSDPrice;
         private readonly string _address;
-        private readonly IEnumerable<EScanTransaction> _transactions;
-        private readonly IEnumerable<EScanTransaction> _internalTransactions;
-        private readonly IEnumerable<EScanTokenTransferEvent> _tokenTransfers;
-        private readonly IEnumerable<EScanTokenTransferEvent> _erc20TokenTransfers;
+        private readonly decimal _balance;
+        private readonly IEnumerable<EtherscanAccountNormalTransaction> _transactions;
+        private readonly IEnumerable<EtherscanAccountInternalTransaction> _internalTransactions;
+        private readonly IEnumerable<INFTTokenTransfer> _tokenTransfers;
+        private readonly IEnumerable<EtherscanAccountERC20TokenEvent> _erc20TokenTransfers;
         private readonly IEnumerable<TokenDataBalance>? _tokenDataBalances;
         private readonly IEnumerable<DexTokenSwapPairsData> _dexTokenSwapPairs;
         private readonly IEnumerable<GreysafeReport>? _greysafeReports;
@@ -82,16 +82,19 @@ namespace Nomis.Etherscan.Calculators
             {
                 var turnoverIntervalsDataList =
                     _transactions.Select(x => new TurnoverIntervalsData(
-                        x.TimeStamp.ToDateTime(),
-                        x.Value,
+                        x.TimeStamp!.ToDateTime(),
+                        BigInteger.TryParse(x.Value, out var value) ? value : 0,
                         x.From?.Equals(_address, StringComparison.InvariantCultureIgnoreCase) == true));
                 return IWalletStatsCalculator<EthereumTransactionIntervalData>
-                    .GetTurnoverIntervals(turnoverIntervalsDataList, _transactions.Any() ? _transactions.Min(x => x.TimeStamp.ToDateTime()) : DateTime.MinValue).ToList();
+                    .GetTurnoverIntervals(_tokenUSDPrice, turnoverIntervalsDataList, _transactions.Any() ? _transactions.Min(x => x.TimeStamp!.ToDateTime()) : DateTime.MinValue).ToList();
             }
         }
 
         /// <inheritdoc />
-        public decimal NativeBalance { get; }
+        public decimal NativeBalance => _balance.ToEth();
+
+        /// <inheritdoc />
+        public decimal HistoricalMedianBalanceUSD { get; } = 0;
 
         /// <inheritdoc />
         public decimal NativeBalanceUSD { get; }
@@ -106,10 +109,10 @@ namespace Nomis.Etherscan.Calculators
 
         /// <inheritdoc />
         public decimal WalletTurnover =>
-            _transactions.Sum(x => (decimal)x.Value).ToEth();
+            _transactions.Sum(x => decimal.TryParse(x.Value, out decimal value) ? value.ToEth() : 0);
 
         /// <inheritdoc />
-        public decimal WalletTurnoverUSD => WalletTurnover * NativeBalanceUSD / NativeBalance;
+        public decimal WalletTurnoverUSD => NativeBalance != 0 ? WalletTurnover * NativeBalanceUSD / NativeBalance : 0;
 
         /// <inheritdoc />
         public IEnumerable<TokenDataBalance>? TokenBalances => _tokenDataBalances?.Any() == true ? _tokenDataBalances : null;
@@ -118,7 +121,8 @@ namespace Nomis.Etherscan.Calculators
         public int TokensHolding => _erc20TokenTransfers.Select(x => x.TokenSymbol).Distinct().Count();
 
         /// <inheritdoc />
-        public int DeployedContracts => _transactions.Count(x => !string.IsNullOrWhiteSpace(x.ContractAddress));
+        public int DeployedContracts =>
+            _transactions.Count(x => !string.IsNullOrWhiteSpace(x.ContractAddress));
 
         /// <inheritdoc />
         public IEnumerable<SnapshotProposal>? SnapshotProposals { get; }
@@ -130,7 +134,8 @@ namespace Nomis.Etherscan.Calculators
         public TallyAccount? TallyAccount { get; }
 
         /// <inheritdoc />
-        public IEnumerable<GreysafeReport>? GreysafeReports => _greysafeReports?.Any() == true ? _greysafeReports : null;
+        public IEnumerable<GreysafeReport>? GreysafeReports =>
+            _greysafeReports?.Any() == true ? _greysafeReports : null;
 
         /// <inheritdoc />
         public IEnumerable<ChainanalysisReport>? ChainanalysisReports =>
@@ -159,12 +164,13 @@ namespace Nomis.Etherscan.Calculators
 
         public EthereumStatCalculator(
             string address,
-            BigInteger balance,
-            decimal balanceUsd,
-            IEnumerable<EScanTransaction> transactions,
-            IEnumerable<EScanTransaction> internalTransactions,
-            IEnumerable<EScanTokenTransferEvent> tokenTransfers,
-            IEnumerable<EScanTokenTransferEvent> erc20TokenTransfers,
+            decimal balance,
+            decimal usdBalance,
+            decimal medianUsdBalance,
+            IEnumerable<EtherscanAccountNormalTransaction> transactions,
+            IEnumerable<EtherscanAccountInternalTransaction> internalTransactions,
+            IEnumerable<INFTTokenTransfer> tokenTransfers,
+            IEnumerable<EtherscanAccountERC20TokenEvent> erc20TokenTransfers,
             SnapshotData? snapshotData,
             TallyAccount? tallyAccount,
             HapiProxyRiskScoreResponse? hapiRiskScore,
@@ -175,9 +181,11 @@ namespace Nomis.Etherscan.Calculators
             IEnumerable<ChainanalysisReport>? chainanalysisReports,
             CyberConnectData? cyberConnectData)
         {
+            _tokenUSDPrice = balance > 0 ? usdBalance / balance.ToEth() : 0;
             _address = address;
-            NativeBalance = balance.ToEth();
-            NativeBalanceUSD = balanceUsd;
+            _balance = balance;
+            NativeBalanceUSD = usdBalance;
+            HistoricalMedianBalanceUSD = medianUsdBalance;
             _transactions = transactions;
             _internalTransactions = internalTransactions;
             _tokenTransfers = tokenTransfers;
@@ -230,13 +238,13 @@ namespace Nomis.Etherscan.Calculators
             return new EthereumWalletStats
             {
                 TotalTransactions = _transactions.Count(),
-                TotalRejectedTransactions = _transactions.Count(t => string.Equals(t.TxreceiptStatus, "0", StringComparison.OrdinalIgnoreCase) || string.Equals(t.IsError, "1", StringComparison.OrdinalIgnoreCase)),
+                TotalRejectedTransactions = _transactions.Count(t => string.Equals(t.IsError, "1", StringComparison.OrdinalIgnoreCase)),
                 MinTransactionTime = intervals.Min(),
                 MaxTransactionTime = intervals.Max(),
                 AverageTransactionTime = intervals.Average(),
-                LastMonthTransactions = _transactions.Count(x => x.TimeStamp.ToDateTime() > monthAgo),
-                LastYearTransactions = _transactions.Count(x => x.TimeStamp.ToDateTime() > yearAgo),
-                TimeFromLastTransaction = (int)((DateTime.UtcNow - _transactions.OrderBy(x => x.TimeStamp).Last().TimeStamp.ToDateTime()).TotalDays / 30)
+                LastMonthTransactions = _transactions.Count(x => x.TimeStamp!.ToDateTime() > monthAgo),
+                LastYearTransactions = _transactions.Count(x => x.TimeStamp!.ToDateTime() > yearAgo),
+                TimeSinceTheLastTransaction = (int)((DateTime.UtcNow - _transactions.OrderBy(x => x.TimeStamp).Last().TimeStamp!.ToDateTime()).TotalDays / 30)
             };
         }
 
@@ -245,25 +253,25 @@ namespace Nomis.Etherscan.Calculators
         {
             var soldTokens = _tokenTransfers.Where(x => x.From?.Equals(_address, StringComparison.InvariantCultureIgnoreCase) == true).ToList();
             var soldSum = IWalletStatsCalculator
-                .TokensSum(soldTokens.Select(x => x.Hash), _internalTransactions.Select(x => (x.Hash, x.Value)));
+                .TokensSum(soldTokens.Select(x => x.Hash!), _internalTransactions.Select(x => (x.Hash!, BigInteger.TryParse(x.Value, out var amount) ? amount : 0)));
 
             var soldTokensIds = soldTokens.Select(x => x.GetTokenUid());
             var buyTokens = _tokenTransfers.Where(x => x.To?.Equals(_address, StringComparison.InvariantCultureIgnoreCase) == true && soldTokensIds.Contains(x.GetTokenUid()));
             var buySum = IWalletStatsCalculator
-                .TokensSum(buyTokens.Select(x => x.Hash), _internalTransactions.Select(x => (x.Hash, x.Value)));
+                .TokensSum(buyTokens.Select(x => x.Hash!), _internalTransactions.Select(x => (x.Hash!, BigInteger.TryParse(x.Value, out var amount) ? amount : 0)));
 
             var buyNotSoldTokens = _tokenTransfers.Where(x => x.To?.Equals(_address, StringComparison.InvariantCultureIgnoreCase) == true && !soldTokensIds.Contains(x.GetTokenUid()));
             var buyNotSoldSum = IWalletStatsCalculator
-                .TokensSum(buyNotSoldTokens.Select(x => x.Hash), _internalTransactions.Select(x => (x.Hash, x.Value)));
+                .TokensSum(buyNotSoldTokens.Select(x => x.Hash!), _internalTransactions.Select(x => (x.Hash!, BigInteger.TryParse(x.Value, out var amount) ? amount : 0)));
 
             int holdingTokens = _tokenTransfers.Count() - soldTokens.Count;
-            decimal nftWorth = buySum == 0 ? 0 : (decimal)soldSum / (decimal)buySum * (decimal)buyNotSoldSum;
+            decimal nftWorth = buySum == 0 ? 0 : soldSum.ToNative() / buySum.ToNative() * buyNotSoldSum.ToNative();
 
             return new EthereumWalletStats
             {
                 NftHolding = holdingTokens,
-                NftTrading = (soldSum - buySum).ToEth(),
-                NftWorth = nftWorth.ToEth()
+                NftTrading = (soldSum - buySum).ToNative(),
+                NftWorth = nftWorth
             };
         }
     }

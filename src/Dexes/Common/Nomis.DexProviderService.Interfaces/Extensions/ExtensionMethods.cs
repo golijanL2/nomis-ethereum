@@ -7,7 +7,9 @@
 
 using Nomis.Blockchain.Abstractions;
 using Nomis.Blockchain.Abstractions.Enums;
+using Nomis.Utils.Contracts.Common;
 using Nomis.Utils.Contracts.Requests;
+using Nomis.Utils.Enums;
 
 namespace Nomis.DexProviderService.Interfaces.Extensions
 {
@@ -19,25 +21,36 @@ namespace Nomis.DexProviderService.Interfaces.Extensions
         /// <summary>
         /// Get the blockchain descriptor in which the score will be minted.
         /// </summary>
-        /// <typeparam name="TWalletRequest">The wallet request type.</typeparam>
         /// <param name="service"><see cref="IDexProviderService"/>.</param>
         /// <param name="request"><see cref="WalletStatsRequest"/>.</param>
+        /// <param name="scoredChain">Scored chain.</param>
         /// <returns>Returns the blockchain descriptor in which the score will be minted.</returns>
-        public static IBlockchainDescriptor? MintChain<TWalletRequest>(
+        public static IBlockchainDescriptor? MintChain(
             this IDexProviderService service,
-            TWalletRequest request)
-            where TWalletRequest : WalletStatsRequest
+            IHasMintChain request,
+            ulong scoredChain)
         {
-            if (request.MintChain == Utils.Enums.MintChain.Native)
+            var mintChain = request.MintChain;
+            var supportedBlockchains = service.Blockchains(BlockchainType.EVM, true);
+            if (mintChain == Utils.Enums.MintChain.Native)
             {
-                return null;
+                var scoredChainDescriptor = supportedBlockchains.Data.Find(b => b.ChainId == scoredChain);
+                if (request.MintBlockchainType == MintChainType.Testnet)
+                {
+                    scoredChainDescriptor = supportedBlockchains.Data.Find(b => b.ChainId != scoredChain && b.BlockchainSlug?.Equals(scoredChainDescriptor?.BlockchainSlug, StringComparison.InvariantCultureIgnoreCase) == true);
+                    if (scoredChainDescriptor == null)
+                    {
+                        throw new NotSupportedException($"{mintChain} blockchain does not supported or disabled.");
+                    }
+                }
+
+                return scoredChainDescriptor;
             }
 
-            var supportedBlockchains = service.Blockchains(BlockchainType.EVM, true);
-            var mintBlockchain = supportedBlockchains.Data.FirstOrDefault(b => b.ChainId == (ulong)request.MintChain);
+            var mintBlockchain = supportedBlockchains.Data.Find(b => b.ChainId == (ulong)mintChain);
             if (mintBlockchain == null)
             {
-                throw new NotSupportedException($"{request.MintChain} blockchain does not supported or disabled.");
+                throw new NotSupportedException($"{mintChain} blockchain does not supported or disabled.");
             }
 
             return mintBlockchain;

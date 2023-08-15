@@ -14,7 +14,7 @@ namespace Nomis.CurrentUserService
     /// <inheritdoc cref="ICurrentUserService"/>
     internal sealed class CurrentUserService :
         ICurrentUserService,
-        IScopedService
+        ITransientService
     {
         private readonly IHttpContextAccessor _accessor;
 
@@ -31,7 +31,13 @@ namespace Nomis.CurrentUserService
         /// <inheritdoc/>
         public Guid GetUserId()
         {
-            return Guid.Empty; // TODO - implement getting id from user wallet
+            string? clientId = _accessor.HttpContext?.Request?.Headers["X-ClientId"]; // TODO - replace to settings or get from API key
+            if (Guid.TryParse(clientId, out var clientIdGuid))
+            {
+                return clientIdGuid;
+            }
+
+            return Guid.Empty;
         }
 
         /// <inheritdoc/>

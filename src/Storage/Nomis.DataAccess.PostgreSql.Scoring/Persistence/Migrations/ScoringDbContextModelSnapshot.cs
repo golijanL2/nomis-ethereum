@@ -88,7 +88,7 @@ namespace Nomis.DataAccess.PostgreSql.Scoring.Persistence.Migrations
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("RawRequest")
-                        .HasColumnType("text");
+                        .HasColumnType("jsonb");
 
                     b.Property<string>("RequestAddress")
                         .IsRequired()
@@ -102,7 +102,7 @@ namespace Nomis.DataAccess.PostgreSql.Scoring.Persistence.Migrations
 
                     b.Property<string>("StatData")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("jsonb");
 
                     b.Property<int>("Version")
                         .HasColumnType("integer");

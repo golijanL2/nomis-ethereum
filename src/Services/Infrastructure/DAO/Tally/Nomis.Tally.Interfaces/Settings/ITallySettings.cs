@@ -15,6 +15,6 @@ namespace Nomis.Tally.Interfaces.Settings
         /// <summary>
         /// Supported blockchain ids.
         /// </summary>
-        public IList<ulong> SupportedChainIds { get; set; }
+        public IList<ulong> SupportedChainIds { get; init; }
     }
 }

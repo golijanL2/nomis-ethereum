@@ -38,9 +38,9 @@ namespace Nomis.Rapyd
         public RapydService(
             IOptions<RapydSettings> rapydOptions)
         {
-            _client = new(rapydOptions.Value.ApiBaseUrl ?? throw new ArgumentNullException(nameof(rapydOptions.Value.ApiBaseUrl)));
-            _accessKey = rapydOptions.Value.AccessKey ?? throw new ArgumentNullException(nameof(rapydOptions.Value.AccessKey));
-            _secretKey = rapydOptions.Value.SecretKey ?? throw new ArgumentNullException(nameof(rapydOptions.Value.SecretKey));
+            _client = new(rapydOptions.Value.ApiBaseUrl ?? "https://sandboxapi.rapyd.net/");
+            _accessKey = rapydOptions.Value.AccessKey ?? string.Empty;
+            _secretKey = rapydOptions.Value.SecretKey ?? string.Empty;
         }
 
         #region Customer

@@ -126,6 +126,11 @@ namespace Nomis.Dex.Abstractions.Enums
         Boba = 288,
 
         /// <summary>
+        /// Hedera networks.
+        /// </summary>
+        Hedera = 295,
+
+        /// <summary>
         /// Shiden.
         /// </summary>
         Shiden = 336,
@@ -254,11 +259,6 @@ namespace Nomis.Dex.Abstractions.Enums
         /// Æternity.
         /// </summary>
         Aeternity = 111112,
-
-        /// <summary>
-        /// Hedera networks.
-        /// </summary>
-        Hedera = 111113,
 
         /// <summary>
         /// Ripple.

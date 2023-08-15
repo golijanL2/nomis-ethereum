@@ -36,7 +36,7 @@ namespace Nomis.DataAccess.PostgreSql.Extensions
         /// <typeparam name="TAuditableDbContext">Тип контекста доступа к данным аудита.</typeparam>
         /// <param name="context">Контекст доступа к данным аудита.</param>
         /// <param name="eventLogger"><see cref="IEventLogger"/>.</param>
-        /// <param name="mediator"><see cref="IMediator"/>.</param>
+        /// <param name="publisher"><see cref="IPublisher"/>.</param>
         /// <param name="currentUserService"><see cref="ICurrentUserService"/>.</param>
         /// <param name="entitySettings"><see cref="EntitySettings"/>.</param>
         /// <param name="cancellationToken"><see cref="CancellationToken"/>.</param>
@@ -44,7 +44,7 @@ namespace Nomis.DataAccess.PostgreSql.Extensions
         public static async Task<int> SaveChangesWithAuditAndPublishEventsAsync<TAuditableDbContext>(
             this TAuditableDbContext context,
             IEventLogger eventLogger,
-            IMediator mediator,
+            IPublisher publisher,
             ICurrentUserService currentUserService,
             IOptionsSnapshot<EntitySettings> entitySettings,
             CancellationToken cancellationToken = new())
@@ -86,12 +86,12 @@ namespace Nomis.DataAccess.PostgreSql.Extensions
             var auditEntries = OnBeforeSaveChanges(context, currentUserId);
             if (currentUserId == Guid.Empty)
             {
-                int result = await PublishEventsAsync(context, eventLogger, mediator, auditEntries, cancellationToken).ConfigureAwait(false);
+                int result = await PublishEventsAsync(context, eventLogger, publisher, auditEntries, cancellationToken).ConfigureAwait(false);
                 return await context.BaseSaveChangesAsync(cancellationToken).ConfigureAwait(false) + result;
             }
             else
             {
-                int result = await PublishEventsAsync(context, eventLogger, mediator, auditEntries, cancellationToken).ConfigureAwait(false);
+                int result = await PublishEventsAsync(context, eventLogger, publisher, auditEntries, cancellationToken).ConfigureAwait(false);
                 result += await OnAfterSaveChangesAsync(context, auditEntries.Where(_ => _.HasTemporaryProperties).ToList()).ConfigureAwait(false);
                 return await context.SaveChangesAsync(true, cancellationToken).ConfigureAwait(false) + result;
             }
@@ -107,19 +107,19 @@ namespace Nomis.DataAccess.PostgreSql.Extensions
         /// <typeparam name="TAuditableDbContext">Тип контекста доступа к данным аудита.</typeparam>
         /// <param name="context">Контекст доступа к данным аудита.</param>
         /// <param name="eventLogger"><see cref="IEventLogger"/>.</param>
-        /// <param name="mediator"><see cref="IMediator"/>.</param>
+        /// <param name="publisher"><see cref="IPublisher"/>.</param>
         /// <param name="currentUserService"><see cref="ICurrentUserService"/>.</param>
         /// <param name="entitySettings"><see cref="EntitySettings"/>.</param>
         /// <returns>Returns the number of affected records in the database.</returns>
         public static int SaveChangesWithAuditAndPublishEvents<TAuditableDbContext>(
             this TAuditableDbContext context,
             IEventLogger eventLogger,
-            IMediator mediator,
+            IPublisher publisher,
             ICurrentUserService currentUserService,
             IOptionsSnapshot<EntitySettings> entitySettings)
                 where TAuditableDbContext : DbContext, IAuditableDbContext
         {
-            return SaveChangesWithAuditAndPublishEventsAsync(context, eventLogger, mediator, currentUserService, entitySettings).GetAwaiter().GetResult();
+            return SaveChangesWithAuditAndPublishEventsAsync(context, eventLogger, publisher, currentUserService, entitySettings).GetAwaiter().GetResult();
         }
 
         #endregion SaveChangesWithAuditAndPublishEvents
@@ -256,14 +256,14 @@ namespace Nomis.DataAccess.PostgreSql.Extensions
         /// <typeparam name="TAuditableDbContext">Тип контекста доступа к данным аудита.</typeparam>
         /// <param name="context">Контекст доступа к данным аудита.</param>
         /// <param name="eventLogger"><see cref="IEventLogger"/>.</param>
-        /// <param name="mediator"><see cref="IMediator"/>.</param>
+        /// <param name="publisher"><see cref="IPublisher"/>.</param>
         /// <param name="auditEntries">Список данных аудита.</param>
         /// <param name="cancellationToken"><see cref="CancellationToken"/>.</param>
         /// <returns>Returns the number of affected records in the database.</returns>
         private static async Task<int> PublishEventsAsync<TAuditableDbContext>(
             TAuditableDbContext context,
             IEventLogger eventLogger,
-            IMediator mediator,
+            IPublisher publisher,
             List<IAuditEntry> auditEntries,
             CancellationToken cancellationToken = new())
             where TAuditableDbContext : DbContext, IAuditableDbContext
@@ -283,7 +283,7 @@ namespace Nomis.DataAccess.PostgreSql.Extensions
             var tasks = domainEvents
                 .Select(async (domainEvent) =>
                 {
-                    var relatedAuditEntries = auditEntries.Where(x => domainEvent?.RelatedEntities?.Any(t => t == x.Entry.Entity.GetType()) == true).ToList();
+                    var relatedAuditEntries = auditEntries.Where(x => domainEvent.RelatedEntities.Any(t => t == x.Entry.Entity.GetType())).ToList();
                     if (relatedAuditEntries.Count > 0)
                     {
                         var oldValues = relatedAuditEntries.Select(x => new
@@ -298,12 +298,12 @@ namespace Nomis.DataAccess.PostgreSql.Extensions
                         }).ToList();
                         var changes = (oldValues.Count == 0 ? null : JsonSerializer.Serialize(oldValues), newValues.Count == 0 ? null : JsonSerializer.Serialize(newValues));
                         await eventLogger.SaveAsync(domainEvent, changes).ConfigureAwait(false);
-                        await mediator.Publish(domainEvent, cancellationToken).ConfigureAwait(false);
+                        await publisher.Publish(domainEvent, cancellationToken).ConfigureAwait(false);
                     }
                     else
                     {
                         await eventLogger.SaveAsync(domainEvent, (null, null)).ConfigureAwait(false);
-                        await mediator.Publish(domainEvent, cancellationToken).ConfigureAwait(false);
+                        await publisher.Publish(domainEvent, cancellationToken).ConfigureAwait(false);
                     }
                 });
             await Task.WhenAll(tasks).ConfigureAwait(false);

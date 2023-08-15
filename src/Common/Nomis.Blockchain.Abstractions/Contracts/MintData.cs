@@ -24,6 +24,8 @@ namespace Nomis.Blockchain.Abstractions.Contracts
         /// <param name="metadataUrl">Token metadata IPFS URL.</param>
         /// <param name="chainId">The blockchain id in which the score was calculated.</param>
         /// <param name="mintedChain">The blockchain descriptor in which the score will be minted.</param>
+        /// <param name="referralCode">Referral code.</param>
+        /// <param name="referrerCode">Referrer code.</param>
         public MintData(
             string? signature,
             ushort mintedScore,
@@ -31,13 +33,17 @@ namespace Nomis.Blockchain.Abstractions.Contracts
             ulong deadline,
             string? metadataUrl,
             ulong chainId,
-            IBlockchainDescriptor mintedChain)
+            IBlockchainDescriptor mintedChain,
+            string referralCode = "anon",
+            string referrerCode = "nomis")
         {
             Signature = signature;
             MintedScore = mintedScore;
             CalculationModel = calculationModel;
             Deadline = deadline;
             MetadataUrl = metadataUrl;
+            ReferralCode = referralCode;
+            ReferrerCode = referrerCode;
             ChainId = chainId;
             MintedChain = mintedChain;
         }
@@ -69,6 +75,16 @@ namespace Nomis.Blockchain.Abstractions.Contracts
         /// The blockchain id in which the score was calculated.
         /// </summary>
         public ulong ChainId { get; init; }
+
+        /// <summary>
+        /// Referral code.
+        /// </summary>
+        public string? ReferralCode { get; init; }
+
+        /// <summary>
+        /// Referrer code.
+        /// </summary>
+        public string? ReferrerCode { get; init; }
 
         /// <summary>
         /// The blockchain descriptor in which the score will be minted.

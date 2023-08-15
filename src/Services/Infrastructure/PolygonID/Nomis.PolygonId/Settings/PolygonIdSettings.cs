@@ -21,31 +21,31 @@ namespace Nomis.PolygonId.Settings
         /// <remarks>
         /// <see href="https://0xpolygonid.github.io/tutorials/issuer-node/issuer-node-api/identity/apis/"/>
         /// </remarks>
-        public string? ApiBaseUrl { get; set; }
+        public string? ApiBaseUrl { get; init; }
 
         /// <summary>
         /// Issuer basic auth username.
         /// </summary>
-        public string? IssuerBasicAuthUsername { get; set; }
+        public string? IssuerBasicAuthUsername { get; init; }
 
         /// <summary>
         /// Issuer basic auth password.
         /// </summary>
-        public string? IssuerBasicAuthPassword { get; set; }
+        public string? IssuerBasicAuthPassword { get; init; }
 
         /// <summary>
         /// Issuer DID.
         /// </summary>
-        public string? IssuerDid { get; set; }
+        public string? IssuerDid { get; init; }
 
         /// <summary>
         /// Nomis credential schema.
         /// </summary>
-        public string? NomisCredentialSchema { get; set; }
+        public string? NomisCredentialSchema { get; init; }
 
         /// <summary>
         /// Nomis credential type.
         /// </summary>
-        public string? NomisCredentialType { get; set; }
+        public string? NomisCredentialType { get; init; }
     }
 }

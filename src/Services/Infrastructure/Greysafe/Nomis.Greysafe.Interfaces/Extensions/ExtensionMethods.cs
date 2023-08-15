@@ -34,9 +34,14 @@ namespace Nomis.Greysafe.Interfaces.Extensions
             {
                 try
                 {
-                    greysafeReportsResponse = (await service.GetWalletReportsAsync(request.Address).ConfigureAwait(false)).Data;
+                    greysafeReportsResponse =
+                        (await service.GetWalletReportsAsync(request.Address).ConfigureAwait(false)).Data;
                 }
                 catch (NoDataException)
+                {
+                    // ignored
+                }
+                catch (HttpRequestException)
                 {
                     // ignored
                 }

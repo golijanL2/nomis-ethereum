@@ -19,6 +19,6 @@ namespace Nomis.BalanceChecker.Settings
         /// <summary>
         /// List of Balance checker data feed.
         /// </summary>
-        public List<BalanceCheckerDataFeed> DataFeeds { get; set; } = new();
+        public List<BalanceCheckerDataFeed> DataFeeds { get; init; } = new();
     }
 }

@@ -36,9 +36,9 @@ namespace Nomis.DataAccess.PostgreSql.Extensions
         {
             return services
                 .AddDatabaseContext<ApplicationDbContext>(configuration)
-                .AddScoped<IApplicationDbContext>(provider => provider.GetRequiredService<ApplicationDbContext>())
-                .AddScoped<ILoggableDbContext>(provider => provider.GetRequiredService<ApplicationDbContext>())
-                .AddScoped<IEventLogger, EventLogger>();
+                .AddTransient<IApplicationDbContext>(provider => provider.GetRequiredService<ApplicationDbContext>())
+                .AddTransient<ILoggableDbContext>(provider => provider.GetRequiredService<ApplicationDbContext>())
+                .AddTransient<IEventLogger, EventLogger>();
         }
 
         #endregion AddApplicationPersistence
@@ -76,7 +76,14 @@ namespace Nomis.DataAccess.PostgreSql.Extensions
             IConfiguration configuration)
             where TDbContext : DbContext
         {
-            services.AddDbContext<TDbContext>(m => m.UseNpgsql(configuration.GetConnectionString("NomisDb"), e => e.MigrationsAssembly(typeof(TDbContext).Assembly.FullName)));
+            services.AddDbContext<TDbContext>(
+                m => m.UseNpgsql(
+                    configuration.GetConnectionString("NomisDb"),
+                    e =>
+                    {
+                        e.MigrationsAssembly(typeof(TDbContext).Assembly.FullName);
+                        e.CommandTimeout(90);
+                    }), ServiceLifetime.Transient);
             using var scope = services.BuildServiceProvider().CreateScope();
             var dbContext = scope.ServiceProvider.GetRequiredService<TDbContext>();
             dbContext.Database.Migrate();

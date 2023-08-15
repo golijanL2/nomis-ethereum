@@ -3,7 +3,7 @@
   "defaultVariables": null,
   "documentGenerator": {
     "fromDocument": {
-      "url": "http://polygon.nomis.cc:3001/static/docs/api/api.yaml",
+      "url": "https://polygon.nomis.cc:3001/static/docs/api/api.yaml",
       "output": "PolygonIdIssuer.nswag.json",
       "newLineBehavior": "Auto"
     }

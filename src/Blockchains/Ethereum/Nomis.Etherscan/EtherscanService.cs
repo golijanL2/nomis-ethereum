@@ -8,10 +8,10 @@
 using System.Globalization;
 using System.Net;
 using System.Net.Http.Json;
+using System.Numerics;
 using System.Text.Json;
 
-using EthScanNet.Lib;
-using EthScanNet.Lib.Models.EScan;
+using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Nethereum.Contracts.Services;
@@ -27,6 +27,9 @@ using Nomis.Blockchain.Abstractions;
 using Nomis.Blockchain.Abstractions.Contracts;
 using Nomis.Blockchain.Abstractions.Enums;
 using Nomis.Blockchain.Abstractions.Extensions;
+using Nomis.Blockchain.Abstractions.Settings;
+using Nomis.Blockscout.Interfaces;
+using Nomis.CacheProviderService.Interfaces;
 using Nomis.Chainanalysis.Interfaces;
 using Nomis.Chainanalysis.Interfaces.Contracts;
 using Nomis.Chainanalysis.Interfaces.Extensions;
@@ -56,7 +59,8 @@ using Nomis.HapiExplorer.Interfaces.Contracts;
 using Nomis.HapiExplorer.Interfaces.Responses;
 using Nomis.IPFS.Interfaces;
 using Nomis.PolygonId.Interfaces;
-using Nomis.PolygonId.Interfaces.Contracts;
+using Nomis.ReferralService.Interfaces;
+using Nomis.ReferralService.Interfaces.Extensions;
 using Nomis.ScoringService.Interfaces;
 using Nomis.Snapshot.Interfaces;
 using Nomis.Snapshot.Interfaces.Contracts;
@@ -82,8 +86,11 @@ namespace Nomis.Etherscan
         IEthereumScoringService,
         ITransientService
     {
+        private readonly BlacklistSettings _blacklistSettings;
+        private readonly IEtherscanClient _client;
         private readonly IScoringService _scoringService;
-        private readonly IEvmSoulboundTokenService _soulboundTokenService;
+        private readonly IReferralService _referralService;
+        private readonly IEvmScoreSoulboundTokenService _soulboundTokenService;
         private readonly ISnapshotService _snapshotService;
         private readonly ITallyService _tallyService;
         private readonly IHapiExplorerService _hapiExplorerService;
@@ -95,17 +102,21 @@ namespace Nomis.Etherscan
         private readonly ICyberConnectService _cyberConnectService;
         private readonly IIPFSService _ipfsService;
         private readonly IPolygonIdService _polygonIdService;
+        private readonly ICacheProviderService _cacheProviderService;
+        private readonly IBlockscoutApiService _blockscoutApiService;
         private readonly EtherscanSettings _settings;
         private readonly Web3 _nethereumClient;
         private readonly HttpClient _coinbaseClient;
-        private readonly EScanClient _client;
 
         /// <summary>
         /// Initialize <see cref="EtherscanService"/>.
         /// </summary>
+        /// <param name="blacklistSettings"><see cref="BlacklistSettings"/>.</param>
         /// <param name="settings"><see cref="EtherscanSettings"/>.</param>
+        /// <param name="client"><see cref="IEtherscanClient"/>.</param>
         /// <param name="scoringService"><see cref="IScoringService"/>.</param>
-        /// <param name="soulboundTokenService"><see cref="IEvmSoulboundTokenService"/>.</param>
+        /// <param name="referralService"><see cref="IReferralService"/>.</param>
+        /// <param name="soulboundTokenService"><see cref="IEvmScoreSoulboundTokenService"/>.</param>
         /// <param name="snapshotService"><see cref="ISnapshotService"/>.</param>
         /// <param name="tallyService"><see cref="ITallyService"/>.</param>
         /// <param name="hapiExplorerService"><see cref="IHapiExplorerService"/>.</param>
@@ -117,11 +128,16 @@ namespace Nomis.Etherscan
         /// <param name="cyberConnectService"><see cref="ICyberConnectService"/>.</param>
         /// <param name="ipfsService"><see cref="IIPFSService"/>.</param>
         /// <param name="polygonIdService"><see cref="IPolygonIdService"/>.</param>
+        /// <param name="cacheProviderService"><see cref="ICacheProviderService"/>.</param>
+        /// <param name="blockscoutApiService"><see cref="IBlockscoutApiService"/>.</param>
         /// <param name="logger"><see cref="ILogger{T}"/>.</param>
         public EtherscanService(
+            IOptions<BlacklistSettings> blacklistSettings,
             IOptions<EtherscanSettings> settings,
+            IEtherscanClient client,
             IScoringService scoringService,
-            IEvmSoulboundTokenService soulboundTokenService,
+            IReferralService referralService,
+            IEvmScoreSoulboundTokenService soulboundTokenService,
             ISnapshotService snapshotService,
             ITallyService tallyService,
             IHapiExplorerService hapiExplorerService,
@@ -133,10 +149,17 @@ namespace Nomis.Etherscan
             ICyberConnectService cyberConnectService,
             IIPFSService ipfsService,
             IPolygonIdService polygonIdService,
+            ICacheProviderService cacheProviderService,
+            IBlockscoutApiService blockscoutApiService,
             ILogger<EtherscanService> logger)
-            : base(settings.Value.BlockchainDescriptors.TryGetValue(BlockchainKind.Mainnet, out var value) ? value : settings.Value.BlockchainDescriptors[BlockchainKind.Testnet])
+#pragma warning disable S3358
+            : base(settings.Value.BlockchainDescriptors.TryGetValue(BlockchainKind.Mainnet, out var value) ? value : settings.Value.BlockchainDescriptors.TryGetValue(BlockchainKind.Testnet, out var testnetValue) ? testnetValue : null)
+#pragma warning restore S3358
         {
+            _blacklistSettings = blacklistSettings.Value;
+            _client = client;
             _scoringService = scoringService;
+            _referralService = referralService;
             _soulboundTokenService = soulboundTokenService;
             _snapshotService = snapshotService;
             _tallyService = tallyService;
@@ -149,11 +172,12 @@ namespace Nomis.Etherscan
             _cyberConnectService = cyberConnectService;
             _ipfsService = ipfsService;
             _polygonIdService = polygonIdService;
+            _cacheProviderService = cacheProviderService;
+            _blockscoutApiService = blockscoutApiService;
             Logger = logger;
             _settings = settings.Value;
-            _client = new(EScanNetwork.MainNet, settings.Value.ApiKey);
 
-            _nethereumClient = new(settings.Value.BlockchainProviderUrl)
+            _nethereumClient = new(settings.Value.BlockchainProviderUrl ?? "https://rpc.ankr.com/eth")
             {
                 TransactionManager =
                 {
@@ -215,198 +239,287 @@ namespace Nomis.Etherscan
                 throw new InvalidAddressException(request.Address);
             }
 
-            var mintBlockchain = _dexProviderService.MintChain(request);
+            #region Blacklist
 
-            var ethAddress = new EScanAddress(request.Address);
-            var balanceWei = (await _client.Accounts.GetBalanceAsync(ethAddress).ConfigureAwait(false)).Balance;
-            decimal balanceUsd = await GetUsdBalanceAsync(balanceWei.ToEth()).ConfigureAwait(false);
-            var transactions = (await _client.Accounts.GetNormalTransactionsAsync(ethAddress).ConfigureAwait(false)).Transactions;
-            var internalTransactions = (await _client.Accounts.GetInternalTransactionsAsync(ethAddress).ConfigureAwait(false)).Transactions;
-            var tokens = (await _client.Accounts.GetTokenEvents(ethAddress).ConfigureAwait(false)).TokenTransferEvents;
-            var erc20Tokens = (await _client.Accounts.GetERC20TokenEvents(ethAddress).ConfigureAwait(false)).ERC20TokenTransferEvents;
-
-            #region HAPI protocol
-
-            HapiProxyRiskScoreResponse? hapiRiskScore = null;
-            if ((request as IWalletHapiProtocolRequest)?.GetHapiProtocolData == true)
+            if (_blacklistSettings.UseBlacklist)
             {
-                try
+                var blacklist = new List<string>();
+                foreach (var blacklistItem in _blacklistSettings.Blacklist)
                 {
-                    hapiRiskScore = (await _hapiExplorerService.GetWalletRiskScoreAsync("ethereum", request.Address).ConfigureAwait(false)).Data;
+                    blacklist.AddRange(blacklistItem.Value);
                 }
-                catch (NoDataException)
+
+                if (blacklist.Contains(request.Address.ToLower()))
                 {
-                    // ignored
+                    throw new CustomException("The specified wallet address cannot be scored.", statusCode: HttpStatusCode.BadRequest);
                 }
             }
 
-            #endregion HAPI protocol
+            #endregion Blacklist
 
-            #region Greysafe scam reports
+            var messages = new List<string>();
 
-            var greysafeReportsResponse = await _greysafeService.ReportsAsync(request as IWalletGreysafeRequest).ConfigureAwait(false);
+            #region Referral
 
-            #endregion Greysafe scam reports
+            var ownReferralCodeResult = await _referralService.GetOwnReferralCodeAsync(request, Logger, cancellationToken).ConfigureAwait(false);
+            messages.AddRange(ownReferralCodeResult.Messages);
+            string? ownReferralCode = ownReferralCodeResult.Data;
 
-            #region Chainanalysis sanctions reports
+            #endregion Referral
 
-            var chainanalysisReportsResponse = await _chainanalysisService.ReportsAsync(request as IWalletChainanalysisRequest).ConfigureAwait(false);
+            var mintBlockchain = _dexProviderService.MintChain(request, ChainId);
 
-            #endregion Chainanalysis sanctions reports
-
-            #region Snapshot protocol
-
-            var snapshotData = await _snapshotService.DataAsync(request as IWalletSnapshotProtocolRequest, ChainId).ConfigureAwait(false);
-
-            #endregion Snapshot protocol
-
-            #region Tally protocol
-
-            var tallyAccountData = await _tallyService.AccountDataAsync(request as IWalletTallyProtocolRequest, ChainId).ConfigureAwait(false);
-
-            #endregion Tally protocol
-
-            #region CyberConnect protocol
-
-            var cyberConnectData = await _cyberConnectService.DataAsync(request as IWalletCyberConnectProtocolRequest, ChainId).ConfigureAwait(false);
-
-            #endregion CyberConnect protocol
-
-            #region Tokens data
-
-            var tokenDataBalances = new List<TokenDataBalance>();
-            if ((request as IWalletTokensSwapPairsRequest)?.GetTokensSwapPairs == true
-                || (request as IWalletTokensBalancesRequest)?.GetHoldTokensBalances == true)
+            TWalletStats? walletStats = null;
+            bool calculateNewScore = false;
+            if (_settings.GetFromCacheStatsIsEnabled)
             {
-                foreach (string? erc20TokenContractId in erc20Tokens.Select(x => x.ContractAddress).Distinct())
+                walletStats = await _cacheProviderService.GetFromCacheAsync<EthereumWalletStats>($"{request.Address}_{ChainId}_{(int)request.CalculationModel}_{(int)request.ScoreType}").ConfigureAwait(false) as TWalletStats;
+            }
+
+            if (walletStats == null)
+            {
+                calculateNewScore = true;
+                string? balanceWei = (await _client.GetBalanceAsync(request.Address).ConfigureAwait(false)).Balance;
+                decimal usdBalance = await GetUsdBalanceAsync(balanceWei!.ToEth()).ConfigureAwait(false);
+                var tokenTransfers = new List<INFTTokenTransfer>();
+                var transactions = (await _client.GetTransactionsAsync<EtherscanAccountNormalTransactions, EtherscanAccountNormalTransaction>(request.Address).ConfigureAwait(false)).ToList();
+                if (!transactions.Any())
                 {
-                    await Task.Delay(250, cancellationToken).ConfigureAwait(false);
-                    var tokenBalance = (await _client.Accounts.GetTokenBalanceForAddress(ethAddress, new(erc20TokenContractId)).ConfigureAwait(false)).Balance;
-                    if (tokenBalance > 0)
-                    {
-                        tokenDataBalances.Add(new TokenDataBalance
+                    return await Result<TWalletScore>.FailAsync(
+                        new()
                         {
-                            Balance = tokenBalance,
-                            Id = erc20TokenContractId
-                        });
-                    }
-                }
-            }
-
-            #endregion Tokens data
-
-            #region Tokens balances (DefiLlama)
-
-            var dexTokensData = new List<DexTokenData>();
-            if (request is IWalletTokensBalancesRequest balancesRequest)
-            {
-                var tokenPrices = await _defiLlamaService.TokensPriceAsync(
-                    tokenDataBalances.Select(t => $"{PlatformIds?[BlockchainPlatform.DefiLLama]}:{t.Id}").ToList(), balancesRequest.SearchWidthInHours).ConfigureAwait(false);
-                foreach (var tokenDataBalance in tokenDataBalances)
-                {
-                    if (tokenPrices?.TokensPrices.ContainsKey($"{PlatformIds?[BlockchainPlatform.DefiLLama]}:{tokenDataBalance.Id}") == true)
-                    {
-                        var tokenPrice = tokenPrices.TokensPrices[$"{PlatformIds?[BlockchainPlatform.DefiLLama]}:{tokenDataBalance.Id}"];
-                        tokenDataBalance.Confidence = tokenPrice.Confidence;
-                        tokenDataBalance.LastPriceDateTime = tokenPrice.LastPriceDateTime;
-                        tokenDataBalance.Price = tokenPrice.Price;
-                        tokenDataBalance.Decimals ??= tokenPrice.Decimals?.ToString();
-                        tokenDataBalance.Symbol ??= tokenPrice.Symbol;
-                    }
+                            Address = request.Address,
+                            Stats = new TWalletStats
+                            {
+                                NoData = true
+                            },
+                            Score = 0
+                        }, new List<string> { "There is no transactions for this wallet." }).ConfigureAwait(false);
                 }
 
-                if (balancesRequest.UseTokenLists)
-                {
-                    var dexTokensDataResult = await _dexProviderService.TokensDataAsync(new TokensDataRequest
-                    {
-                        Blockchain = (Chain)ChainId,
-                        IncludeUniversalTokenLists = balancesRequest.IncludeUniversalTokenLists,
-                        FromCache = true
-                    }).ConfigureAwait(false);
-                    dexTokensData = dexTokensDataResult.Data;
+                var erc20Tokens = (await _client.GetTransactionsAsync<EtherscanAccountERC20TokenEvents, EtherscanAccountERC20TokenEvent>(request.Address).ConfigureAwait(false)).ToList();
+                var internalTransactions = (await _client.GetTransactionsAsync<EtherscanAccountInternalTransactions, EtherscanAccountInternalTransaction>(request.Address).ConfigureAwait(false)).ToList();
+                var erc721Tokens = (await _client.GetTransactionsAsync<EtherscanAccountERC721TokenEvents, EtherscanAccountERC721TokenEvent>(request.Address).ConfigureAwait(false)).ToList();
 
+                // var erc1155Tokens = (await _client.GetTransactionsAsync<EtherscanAccountERC1155TokenEvents, EtherscanAccountERC1155TokenEvent>(request.Address).ConfigureAwait(false)).ToList();
+                // tokenTransfers.AddRange(erc1155Tokens);
+                tokenTransfers.AddRange(erc721Tokens);
+
+                #region Counterparties
+
+                if (_settings is IFilterCounterpartiesByCalculationModelSettings counterpartiesSettings &&
+                    counterpartiesSettings.CounterpartiesFilterData.TryGetValue(request.CalculationModel, out var counterpartiesData))
+                {
+                    var counterpartiesContracts = counterpartiesData.Where(x => x.UseCounterparty).Select(x => x.ContractAddress.ToLowerInvariant()).ToList();
+                    transactions = transactions.Where(x => counterpartiesContracts.Contains(x.ContractAddress?.ToLowerInvariant() ?? string.Empty) || counterpartiesContracts.Contains(x.To?.ToLowerInvariant() ?? string.Empty)).ToList();
+                    internalTransactions = internalTransactions.Where(x => counterpartiesContracts.Contains(x.To?.ToLowerInvariant() ?? string.Empty)).ToList();
+                    erc20Tokens = erc20Tokens.Where(x => counterpartiesContracts.Contains(x.ContractAddress?.ToLowerInvariant() ?? string.Empty) || counterpartiesContracts.Contains(x.To?.ToLowerInvariant() ?? string.Empty)).ToList();
+                }
+
+                #endregion Counterparties
+
+                #region HAPI protocol
+
+                HapiProxyRiskScoreResponse? hapiRiskScore = null;
+                if ((request as IWalletHapiProtocolRequest)?.GetHapiProtocolData == true)
+                {
+                    try
+                    {
+                        hapiRiskScore = (await _hapiExplorerService.GetWalletRiskScoreAsync("ethereum", request.Address).ConfigureAwait(false)).Data;
+                    }
+                    catch (NoDataException)
+                    {
+                        // ignored
+                    }
+                }
+
+                #endregion HAPI protocol
+
+                #region Greysafe scam reports
+
+                var greysafeReportsResponse = await _greysafeService.ReportsAsync(request as IWalletGreysafeRequest).ConfigureAwait(false);
+
+                #endregion Greysafe scam reports
+
+                #region Chainanalysis sanctions reports
+
+                var chainanalysisReportsResponse = await _chainanalysisService.ReportsAsync(request as IWalletChainanalysisRequest).ConfigureAwait(false);
+
+                #endregion Chainanalysis sanctions reports
+
+                #region Snapshot protocol
+
+                var snapshotData = await _snapshotService.DataAsync(request as IWalletSnapshotProtocolRequest, ChainId).ConfigureAwait(false);
+
+                #endregion Snapshot protocol
+
+                #region Tally protocol
+
+                var tallyAccountData = await _tallyService.AccountDataAsync(request as IWalletTallyProtocolRequest, ChainId).ConfigureAwait(false);
+
+                #endregion Tally protocol
+
+                #region CyberConnect protocol
+
+                var cyberConnectData = await _cyberConnectService.DataAsync(request as IWalletCyberConnectProtocolRequest, ChainId).ConfigureAwait(false);
+
+                #endregion CyberConnect protocol
+
+                #region Tokens data
+
+                var tokenDataBalances = new List<TokenDataBalance>();
+                if ((request as IWalletTokensSwapPairsRequest)?.GetTokensSwapPairs == true
+                    || (request as IWalletTokensBalancesRequest)?.GetHoldTokensBalances == true)
+                {
+                    foreach (string? erc20TokenContractId in erc20Tokens.Select(x => x.ContractAddress).Distinct())
+                    {
+                        await _settings.WaitForRequestRateLimit().ConfigureAwait(false);
+                        var tokenBalance = (await _client.GetTokenBalanceAsync(request.Address, erc20TokenContractId!).ConfigureAwait(false)).Balance?.ToBigInteger();
+                        if (tokenBalance > 0)
+                        {
+                            tokenDataBalances.Add(new TokenDataBalance
+                            {
+                                ChainId = ChainId,
+                                Balance = (BigInteger)tokenBalance,
+                                Id = erc20TokenContractId
+                            });
+                        }
+                    }
+                }
+
+                #endregion Tokens data
+
+                #region Tokens balances (DefiLlama)
+
+                var dexTokensData = new List<DexTokenData>();
+                if (request is IWalletTokensBalancesRequest balancesRequest)
+                {
+                    var tokenPrices = await _defiLlamaService.TokensPriceAsync(
+                        tokenDataBalances.Select(t => $"{PlatformIds?[BlockchainPlatform.DefiLLama]}:{t.Id}").ToList(), balancesRequest.SearchWidthInHours).ConfigureAwait(false);
                     foreach (var tokenDataBalance in tokenDataBalances)
                     {
-                        var dexTokenData = dexTokensDataResult.Data.FirstOrDefault(t => t.Id?.Equals(tokenDataBalance.Id, StringComparison.OrdinalIgnoreCase) == true);
-                        tokenDataBalance.LogoUri ??= dexTokenData?.LogoUri;
-                        tokenDataBalance.Decimals ??= dexTokenData?.Decimals;
-                        tokenDataBalance.Symbol ??= dexTokenData?.Symbol;
-                        tokenDataBalance.Name ??= dexTokenData?.Name;
+                        if (tokenPrices?.TokensPrices.ContainsKey($"{PlatformIds?[BlockchainPlatform.DefiLLama]}:{tokenDataBalance.Id}") == true)
+                        {
+                            var tokenPrice = tokenPrices.TokensPrices[$"{PlatformIds?[BlockchainPlatform.DefiLLama]}:{tokenDataBalance.Id}"];
+                            tokenDataBalance.Confidence = tokenPrice.Confidence;
+                            tokenDataBalance.LastPriceDateTime = tokenPrice.LastPriceDateTime;
+                            tokenDataBalance.Price = tokenPrice.Price;
+                            tokenDataBalance.Decimals ??= tokenPrice.Decimals?.ToString();
+                            tokenDataBalance.Symbol ??= tokenPrice.Symbol;
+                        }
+                    }
+
+                    if (balancesRequest.UseTokenLists)
+                    {
+                        var dexTokensDataResult = await _dexProviderService.TokensDataAsync(new TokensDataRequest
+                        {
+                            Blockchain = (Chain)ChainId,
+                            IncludeUniversalTokenLists = balancesRequest.IncludeUniversalTokenLists,
+                            FromCache = true
+                        }).ConfigureAwait(false);
+                        dexTokensData = dexTokensDataResult.Data;
+
+                        foreach (var tokenDataBalance in tokenDataBalances)
+                        {
+                            var dexTokenData = dexTokensDataResult.Data.Find(t => t.Id?.Equals(tokenDataBalance.Id, StringComparison.OrdinalIgnoreCase) == true);
+                            tokenDataBalance.LogoUri ??= dexTokenData?.LogoUri;
+                            tokenDataBalance.Decimals ??= dexTokenData?.Decimals;
+                            tokenDataBalance.Symbol ??= dexTokenData?.Symbol;
+                            tokenDataBalance.Name ??= dexTokenData?.Name;
+                        }
+                    }
+
+                    tokenDataBalances = tokenDataBalances
+                        .Where(b => b.TotalAmountPrice > 0)
+                        .OrderByDescending(b => b.TotalAmountPrice)
+                        .ThenByDescending(b => b.Balance)
+                        .ThenBy(b => b.Symbol)
+                        .ToList();
+                }
+
+                #endregion Tokens balances
+
+                #region Swap pairs from DEXes
+
+                var dexTokenSwapPairs = new List<DexTokenSwapPairsData>();
+                if ((request as IWalletTokensSwapPairsRequest)?.GetTokensSwapPairs == true && tokenDataBalances.Any())
+                {
+                    var swapPairsResult = await _dexProviderService.BlockchainSwapPairsAsync(new()
+                    {
+                        Blockchain = (Chain)ChainId,
+                        First = (request as IWalletTokensSwapPairsRequest)?.FirstSwapPairs ?? 100,
+                        Skip = (request as IWalletTokensSwapPairsRequest)?.Skip ?? 0,
+                        FromCache = false
+                    }).ConfigureAwait(false);
+                    if (swapPairsResult.Succeeded)
+                    {
+                        dexTokenSwapPairs.AddRange(tokenDataBalances.Select(t =>
+                            DexTokenSwapPairsData.ForSwapPairs(t.Id!, t.Balance, swapPairsResult.Data, dexTokensData)));
+                        dexTokenSwapPairs.RemoveAll(p => !p.TokenSwapPairs.Any());
                     }
                 }
 
-                tokenDataBalances = tokenDataBalances
-                    .OrderByDescending(b => b.TotalAmountPrice)
-                    .ThenByDescending(b => b.Amount)
-                    .ThenBy(b => b.Symbol)
-                    .ToList();
-            }
+                #endregion Swap pairs from DEXes
 
-            #endregion Tokens balances
+                #region Aave protocol
 
-            #region Swap pairs from DEXes
-
-            var dexTokenSwapPairs = new List<DexTokenSwapPairsData>();
-            if ((request as IWalletTokensSwapPairsRequest)?.GetTokensSwapPairs == true && tokenDataBalances.Any())
-            {
-                var swapPairsResult = await _dexProviderService.BlockchainSwapPairsAsync(new()
+                AaveUserAccountDataResponse? aaveAccountDataResponse = null;
+                if ((request as IWalletAaveProtocolRequest)?.GetAaveProtocolData == true)
                 {
-                    Blockchain = (Chain)ChainId,
-                    First = (request as IWalletTokensSwapPairsRequest)?.FirstSwapPairs ?? 100,
-                    Skip = (request as IWalletTokensSwapPairsRequest)?.Skip ?? 0,
-                    FromCache = false
-                }).ConfigureAwait(false);
-                if (swapPairsResult.Succeeded)
-                {
-                    dexTokenSwapPairs.AddRange(tokenDataBalances.Select(t =>
-                        DexTokenSwapPairsData.ForSwapPairs(t.Id!, t.Balance, swapPairsResult.Data, dexTokensData)));
-                    dexTokenSwapPairs.RemoveAll(p => !p.TokenSwapPairs.Any());
+                    aaveAccountDataResponse = (await _aaveService.GetAaveUserAccountDataAsync(AaveChain.Ethereum, request.Address).ConfigureAwait(false)).Data;
                 }
+
+                #endregion Aave protocol
+
+                #region Median USD balance
+
+                decimal medianUsdBalance = await _scoringService.MedianBalanceUsdAsync<EthereumWalletStats>(request.Address, ChainId, request.CalculationModel, _settings, usdBalance + (tokenDataBalances.Any() ? tokenDataBalances : null)?.Sum(b => b.TotalAmountPrice) ?? 0, cancellationToken).ConfigureAwait(false);
+
+                #endregion Median USD balance
+
+                walletStats = new EthereumStatCalculator(
+                        request.Address,
+                        decimal.TryParse(balanceWei, out decimal weiBalance) ? weiBalance : 0,
+                        usdBalance,
+                        medianUsdBalance,
+                        transactions,
+                        internalTransactions,
+                        tokenTransfers,
+                        erc20Tokens,
+                        snapshotData,
+                        tallyAccountData,
+                        hapiRiskScore,
+                        tokenDataBalances,
+                        dexTokenSwapPairs,
+                        aaveAccountDataResponse,
+                        greysafeReportsResponse?.Reports,
+                        chainanalysisReportsResponse?.Identifications,
+                        cyberConnectData)
+                    .Stats() as TWalletStats;
+
+                await _cacheProviderService.SetCacheAsync($"{request.Address}_{ChainId}_{(int)request.CalculationModel}_{(int)request.ScoreType}", walletStats!, new DistributedCacheEntryOptions
+                {
+                    AbsoluteExpirationRelativeToNow = _settings.GetFromCacheStatsTimeLimit
+                }).ConfigureAwait(false);
             }
-
-            #endregion Swap pairs from DEXes
-
-            #region Aave protocol
-
-            AaveUserAccountDataResponse? aaveAccountDataResponse = null;
-            if ((request as IWalletAaveProtocolRequest)?.GetAaveProtocolData == true)
-            {
-                aaveAccountDataResponse = (await _aaveService.GetAaveUserAccountDataAsync(AaveChain.Ethereum, request.Address).ConfigureAwait(false)).Data;
-            }
-
-            #endregion Aave protocol
-
-            var walletStats = new EthereumStatCalculator(
-                    request.Address,
-                    balanceWei,
-                    balanceUsd,
-                    transactions,
-                    internalTransactions,
-                    tokens,
-                    erc20Tokens,
-                    snapshotData,
-                    tallyAccountData,
-                    hapiRiskScore,
-                    tokenDataBalances,
-                    dexTokenSwapPairs,
-                    aaveAccountDataResponse,
-                    greysafeReportsResponse?.Reports,
-                    chainanalysisReportsResponse?.Identifications,
-                    cyberConnectData)
-                .Stats() as TWalletStats;
 
             double score = walletStats!.CalculateScore<TWalletStats, TTransactionIntervalData>(ChainId, request.CalculationModel);
-            var scoringData = new ScoringData(request.Address, request.Address, request.CalculationModel, JsonSerializer.Serialize(request), ChainId, score, JsonSerializer.Serialize(walletStats));
-            await _scoringService.SaveScoringDataToDatabaseAsync(scoringData, cancellationToken).ConfigureAwait(false);
 
-            var metadataResult = await _soulboundTokenService.TokenMetadataAsync(_ipfsService, request, ChainId, ChainName, score).ConfigureAwait(false);
+            if (calculateNewScore)
+            {
+                var scoringData = new ScoringData(request.Address, request.Address, request.CalculationModel, JsonSerializer.Serialize(request), ChainId, score, JsonSerializer.Serialize(walletStats));
+                await _scoringService.SaveScoringDataToDatabaseAsync(scoringData, cancellationToken).ConfigureAwait(false);
+            }
+
+            var metadataResult = await _soulboundTokenService.TokenMetadataAsync(_ipfsService, _cacheProviderService, request, ChainId, ChainName, score).ConfigureAwait(false);
 
             // getting signature
             ushort mintedScore = (ushort)(score * 10000);
             var signatureResult = await _soulboundTokenService
-                .SignatureAsync(request, mintedScore, mintBlockchain?.ChainId ?? request.GetChainId(_settings), mintBlockchain?.SBTData ?? request.GetSBTData(_settings), metadataResult.Data, ChainId, (request as IWalletGreysafeRequest)?.GetGreysafeData, (request as IWalletChainanalysisRequest)?.GetChainanalysisData, (request as IWalletHapiProtocolRequest)?.GetHapiProtocolData).ConfigureAwait(false);
-            var messages = signatureResult.Messages;
-            messages.Add($"Got {ChainName} wallet {request.ScoreType.ToString()} score.");
+                .SignatureAsync(request, mintedScore, mintBlockchain?.ChainId ?? request.GetChainId(_settings), mintBlockchain?.SBTData ?? request.GetSBTData(_settings), metadataResult.Data, ChainId, ownReferralCode ?? "anon", request.ReferrerCode ?? "nomis", (request as IWalletGreysafeRequest)?.GetGreysafeData, (request as IWalletChainanalysisRequest)?.GetChainanalysisData, (request as IWalletHapiProtocolRequest)?.GetHapiProtocolData).ConfigureAwait(false);
+
+            messages.AddRange(signatureResult.Messages);
+            messages.Add(calculateNewScore ? $"Got {ChainName} wallet {request.ScoreType.ToString()} score." : $"Got {ChainName} wallet {request.ScoreType.ToString()} score created before.");
 
             #region DID
 
@@ -421,8 +534,10 @@ namespace Nomis.Etherscan
                     Address = request.Address,
                     Stats = walletStats,
                     Score = score,
-                    MintData = request.PrepareToMint ? new MintData(signatureResult.Data.Signature, mintedScore, request.CalculationModel, request.Deadline, metadataResult.Data, ChainId, mintBlockchain ?? this) : null,
-                    DIDData = didDataResult.Data
+                    MintData = request.PrepareToMint ? new MintData(signatureResult.Data.Signature, mintedScore, request.CalculationModel, request.Deadline, metadataResult.Data, ChainId, mintBlockchain ?? this, ownReferralCode ?? "anon", request.ReferrerCode ?? "nomis") : null,
+                    DIDData = didDataResult.Data,
+                    ReferralCode = ownReferralCode,
+                    ReferrerCode = request.ReferrerCode
                 }, messages).ConfigureAwait(false);
         }
 

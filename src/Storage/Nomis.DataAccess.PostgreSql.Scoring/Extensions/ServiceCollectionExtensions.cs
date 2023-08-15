@@ -36,8 +36,9 @@ namespace Nomis.DataAccess.PostgreSql.Scoring.Extensions
             services
                 .AddMediatR(Assembly.GetExecutingAssembly())
                 .AddDatabaseContext<ScoringDbContext>(configuration)
-                .AddScoped<IAuditableDbContext>(provider => provider.GetRequiredService<ScoringDbContext>())
-                .AddScoped<IScoringDbContext>(provider => provider.GetRequiredService<ScoringDbContext>());
+                .AddTransient<IAuditableDbContext>(provider => provider.GetRequiredService<ScoringDbContext>())
+                .AddTransient<IScoringDbContext>(provider => provider.GetRequiredService<ScoringDbContext>())
+                .AddTransient<IScoringReadDbContext, ScoringReadDbContext>();
             services.AddTransient<IDatabaseSeeder, ScoringDbSeeder>();
 
             return services;

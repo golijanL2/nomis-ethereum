@@ -62,6 +62,19 @@ namespace Nomis.Blockchain.Abstractions.Stats
                 case ScoringCalculationModel.Halo:
                     return 4.7 / 100;
                 case ScoringCalculationModel.CommonV2:
+                case ScoringCalculationModel.CommonV3:
+                    return 11.25 / 100;
+                case ScoringCalculationModel.Rubic:
+                    return 2.03 / 100;
+                case ScoringCalculationModel.HederaSybilPrevention:
+                    return 3.68 / 100;
+                case ScoringCalculationModel.HederaDeFi:
+                    return 3.22 / 100;
+                case ScoringCalculationModel.HederaNFT:
+                    return 6.49 / 100;
+                case ScoringCalculationModel.HederaReputation:
+                    return 12.5 / 100;
+                case ScoringCalculationModel.ZkSyncEra:
                     return 11.25 / 100;
                 case ScoringCalculationModel.CommonV1:
                 default:
@@ -79,6 +92,7 @@ namespace Nomis.Blockchain.Abstractions.Stats
                 case ScoringCalculationModel.Symbiosis:
                 case ScoringCalculationModel.XDEFI:
                 case ScoringCalculationModel.Halo:
+                case ScoringCalculationModel.Rubic:
                     return deployedContracts switch
                     {
                         0 => 12.99,
@@ -87,7 +101,13 @@ namespace Nomis.Blockchain.Abstractions.Stats
                         < 10 => 87.06,
                         _ => 100
                     };
+                case ScoringCalculationModel.HederaSybilPrevention:
+                case ScoringCalculationModel.HederaDeFi:
+                case ScoringCalculationModel.HederaNFT:
+                case ScoringCalculationModel.HederaReputation:
                 case ScoringCalculationModel.CommonV2:
+                case ScoringCalculationModel.CommonV3:
+                case ScoringCalculationModel.ZkSyncEra:
                     return deployedContracts switch
                     {
                         0 => 12.44,

@@ -51,6 +51,14 @@ namespace Nomis.CacheProviderService
         }
 
         /// <inheritdoc/>
+        public async Task<string?> GetStringFromCacheAsync(
+            string key)
+        {
+            string? cachedResponse = await _cache.GetStringAsync(key).ConfigureAwait(false);
+            return cachedResponse;
+        }
+
+        /// <inheritdoc/>
         public async Task SetCacheAsync(
             string key,
             string value,

@@ -7,7 +7,7 @@
 
 namespace Nomis.Utils.Contracts.Properties
 {
-    /// <inheritdoc cref="IHasAddress{TId}"/>
+    /// <inheritdoc cref="IHasAddress{TAddress}"/>
     public interface IHasAddress :
         IHasAddress<string?>
     {

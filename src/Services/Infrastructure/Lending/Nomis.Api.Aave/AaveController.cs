@@ -8,7 +8,6 @@
 using System.ComponentModel.DataAnnotations;
 using System.Net.Mime;
 
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -72,7 +71,6 @@ namespace Nomis.Api.Aave
         /// <response code="404">No data found.</response>
         /// <response code="500">Unknown internal error.</response>
         [HttpGet("{blockchain}/wallet/{address}/data", Name = "GetAaveUserData")]
-        [AllowAnonymous]
         [SwaggerOperation(
             OperationId = "GetAaveUserData",
             Tags = new[] { AaveTag })]

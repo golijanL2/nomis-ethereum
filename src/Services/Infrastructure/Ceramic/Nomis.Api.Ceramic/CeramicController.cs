@@ -7,7 +7,6 @@
 
 using System.Net.Mime;
 
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -70,7 +69,6 @@ namespace Nomis.Api.Ceramic
         /// <response code="404">No data found.</response>
         /// <response code="500">Unknown internal error.</response>
         [HttpGet("streams/{streamId}", Name = "GetCeramicStreamState")]
-        [AllowAnonymous]
         [SwaggerOperation(
             OperationId = "GetCeramicStreamState",
             Tags = new[] { CeramicTag })]
@@ -102,7 +100,6 @@ namespace Nomis.Api.Ceramic
         /// <response code="404">No data found.</response>
         /// <response code="500">Unknown internal error.</response>
         [HttpGet("commits/{streamId}", Name = "GetCeramicStreamCommits")]
-        [AllowAnonymous]
         [SwaggerOperation(
             OperationId = "GetCeramicStreamCommits",
             Tags = new[] { CeramicTag })]
@@ -129,7 +126,6 @@ namespace Nomis.Api.Ceramic
         /// <response code="404">No data found.</response>
         /// <response code="500">Unknown internal error.</response>
         [HttpPost("streams", Name = "CreateCeramicStream")]
-        [AllowAnonymous]
         [SwaggerOperation(
             OperationId = "CreateCeramicStream",
             Tags = new[] { CeramicTag })]
@@ -156,7 +152,6 @@ namespace Nomis.Api.Ceramic
         /// <response code="404">No data found.</response>
         /// <response code="500">Unknown internal error.</response>
         [HttpPost("commits", Name = "UpdateCeramicStream")]
-        [AllowAnonymous]
         [SwaggerOperation(
             OperationId = "UpdateCeramicStream",
             Tags = new[] { CeramicTag })]

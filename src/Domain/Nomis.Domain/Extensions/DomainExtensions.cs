@@ -35,7 +35,7 @@ namespace Nomis.Domain.Extensions
         /// </summary>
         /// <param name="type">The type being checked.</param>
         /// <returns>Returns true if the type being domain. Otherwise - false.</returns>
-        public static bool IsDomainObject(this Type type) => DomainTypes.Any(s => s.IsAssignableFrom(type));
+        public static bool IsDomainObject(this Type type) => DomainTypes.Exists(s => s.IsAssignableFrom(type));
 
         /// <summary>
         /// Check if the type is <see cref="IAggregate"/>.

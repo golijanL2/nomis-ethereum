@@ -21,16 +21,16 @@ namespace Nomis.Rapyd.Settings
         /// <remarks>
         /// <see href="https://docs.rapyd.net/build-with-rapyd/docs"/>
         /// </remarks>
-        public string? ApiBaseUrl { get; set; }
+        public string? ApiBaseUrl { get; init; }
 
         /// <summary>
         /// API access key.
         /// </summary>
-        public string? AccessKey { get; set; }
+        public string? AccessKey { get; init; }
 
         /// <summary>
         /// API secret key.
         /// </summary>
-        public string? SecretKey { get; set; }
+        public string? SecretKey { get; init; }
     }
 }

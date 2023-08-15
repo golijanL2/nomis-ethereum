@@ -130,7 +130,7 @@ namespace Nomis.DeFi
         {
             var responseAliasList = responseAliases.ToList();
             var response = await _client.SendQueryAsync<JsonObject>(query).ConfigureAwait(false);
-            var result = response.Data[responseAliasList.First()];
+            var result = response.Data[responseAliasList[0]];
             responseAliasList.RemoveAt(0);
             foreach (string responseAlias in responseAliasList)
             {

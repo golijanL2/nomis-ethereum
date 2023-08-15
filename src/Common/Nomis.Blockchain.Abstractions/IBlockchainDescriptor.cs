@@ -7,7 +7,7 @@
 
 using Nomis.Blockchain.Abstractions.Contracts;
 using Nomis.Blockchain.Abstractions.Enums;
-using Nomis.SoulboundTokenService.Interfaces.Contracts;
+using Nomis.Utils.Contracts.NFT;
 using Nomis.Utils.Enums;
 
 namespace Nomis.Blockchain.Abstractions
@@ -17,6 +17,11 @@ namespace Nomis.Blockchain.Abstractions
     /// </summary>
     public interface IBlockchainDescriptor
     {
+        /// <summary>
+        /// Is testnet.
+        /// </summary>
+        public bool IsTestnet { get; }
+
         /// <summary>
         /// Is enabled.
         /// </summary>
@@ -71,7 +76,7 @@ namespace Nomis.Blockchain.Abstractions
         /// Soulbound tokens common data.
         /// </summary>
         // ReSharper disable once InconsistentNaming
-        public IDictionary<ScoreType, SoulboundTokenCommonData>? SBTData { get; }
+        public IDictionary<ScoreType, NFTCommonData>? SBTData { get; }
 
         /// <summary>
         /// Native currency token data.
@@ -94,9 +99,9 @@ namespace Nomis.Blockchain.Abstractions
         public string? LabelIcon { get; set; }
 
         /// <summary>
-        /// Enabled.
+        /// Is hided.
         /// </summary>
-        public bool Enabled { get; set; }
+        public bool IsHided { get; set; }
 
         /// <summary>
         /// Type.

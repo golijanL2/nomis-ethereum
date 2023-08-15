@@ -16,6 +16,44 @@ namespace Nomis.Blockchain.Abstractions.Contracts
     public class TokenDataBalance :
         TokenData
     {
+        private decimal _amount;
+        private decimal _totalAmountPrice;
+
+        /// <summary>
+        /// Initialize <see cref="TokenDataBalance"/>.
+        /// </summary>
+        public TokenDataBalance()
+        {
+        }
+
+        /// <summary>
+        /// Initialize <see cref="TokenDataBalance"/>.
+        /// </summary>
+        /// <param name="tokenData"><see cref="TokenData"/>.</param>
+        public TokenDataBalance(
+            TokenData tokenData)
+            : base(tokenData)
+        {
+        }
+
+        /// <summary>
+        /// Initialize <see cref="TokenDataBalance"/>.
+        /// </summary>
+        /// <param name="tokenDataBalance"><see cref="TokenDataBalance"/>.</param>
+        /// <param name="balance">Balance.</param>
+        public TokenDataBalance(
+            TokenDataBalance tokenDataBalance,
+            BigInteger balance)
+            : base(tokenDataBalance)
+        {
+            _amount = 0;
+            Balance = balance;
+            Price = tokenDataBalance.Price;
+            LastPriceDateTime = tokenDataBalance.LastPriceDateTime;
+            Confidence = tokenDataBalance.Confidence;
+            ChainId = tokenDataBalance.ChainId;
+        }
+
         /// <summary>
         /// Balance.
         /// </summary>
@@ -29,19 +67,52 @@ namespace Nomis.Blockchain.Abstractions.Contracts
         {
             get
             {
-                int.TryParse(Decimals, out int decimals);
-                var realAmount = Balance;
-                for (int i = 0; i < decimals; i++)
+                if (_amount > 0)
                 {
-                    realAmount /= 10;
+                    return _amount;
                 }
 
-                if (realAmount <= new BigInteger(decimal.MaxValue))
+                if (Decimals != null && int.TryParse(Decimals, out int decimals))
                 {
-                    return (decimal)realAmount;
+                    var realAmount = Balance;
+                    if (realAmount <= new BigInteger(decimal.MaxValue))
+                    {
+                        _amount = (decimal)realAmount;
+                        for (int i = 0; i < decimals; i++)
+                        {
+                            _amount /= 10;
+                        }
+
+                        return _amount;
+                    }
+                    else
+                    {
+                        ulong multiplier = 1;
+                        for (int i = 0; i < decimals; i++)
+                        {
+                            multiplier *= 10;
+                        }
+
+                        try
+                        {
+                            _amount = (decimal)(realAmount / new BigInteger(multiplier));
+                            return _amount;
+                        }
+                        catch
+                        {
+                            _amount = 0;
+                            return _amount;
+                        }
+                    }
                 }
 
-                return 0;
+                _amount = 0;
+                return _amount;
+            }
+
+            set
+            {
+                _amount = value;
             }
         }
 
@@ -63,6 +134,43 @@ namespace Nomis.Blockchain.Abstractions.Contracts
         /// <summary>
         /// Total token balance amount price.
         /// </summary>
-        public decimal TotalAmountPrice => Price * Amount;
+        public decimal TotalAmountPrice
+        {
+            get
+            {
+                if (_totalAmountPrice > 0)
+                {
+                    return _totalAmountPrice;
+                }
+
+                try
+                {
+                    if (Price == 0)
+                    {
+                        _totalAmountPrice = 0;
+                    }
+                    else
+                    {
+                        _totalAmountPrice = Price * Amount;
+                    }
+                }
+                catch
+                {
+                    _totalAmountPrice = 0;
+                }
+
+                return _totalAmountPrice;
+            }
+
+            set
+            {
+                _totalAmountPrice = value;
+            }
+        }
+
+        /// <summary>
+        /// Token blockchain id.
+        /// </summary>
+        public ulong ChainId { get; set; }
     }
 }

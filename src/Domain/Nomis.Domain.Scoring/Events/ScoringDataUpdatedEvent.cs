@@ -61,24 +61,31 @@ namespace Nomis.Domain.Scoring.Events
         public Guid Id { get; private set; }
 
         /// <inheritdoc cref="ScoringData.RequestAddress"/>
+        [JsonInclude]
         public string RequestAddress { get; private set; }
 
         /// <inheritdoc cref="ScoringData.ResolvedAddress"/>
+        [JsonInclude]
         public string? ResolvedAddress { get; private set; }
 
         /// <inheritdoc cref="ScoringData.CalculationModel"/>
+        [JsonInclude]
         public ScoringCalculationModel CalculationModel { get; private set; }
 
         /// <inheritdoc cref="ScoringData.RawRequest"/>
+        [JsonInclude]
         public string? RawRequest { get; private set; }
 
         /// <inheritdoc cref="ScoringData.Blockchain"/>
+        [JsonInclude]
         public ulong Blockchain { get; private set; }
 
         /// <inheritdoc cref="ScoringData.Score"/>
+        [JsonInclude]
         public double Score { get; private set; }
 
         /// <inheritdoc cref="ScoringData.StatData"/>
+        [JsonInclude]
         public string StatData { get; private set; }
     }
 }

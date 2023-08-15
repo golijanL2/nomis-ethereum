@@ -19,6 +19,6 @@ namespace Nomis.Dex.Abstractions
         /// <summary>
         /// List of DEX descriptors data.
         /// </summary>
-        public IList<DexDescriptor>? DexDescriptors { get; set; }
+        public IList<DexDescriptor>? DexDescriptors { get; init; }
     }
 }

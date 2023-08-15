@@ -59,13 +59,29 @@ namespace Nomis.DexProviderService.Extensions
                 .SelectMany(a => a.GetTypes()
                     .Where(type => type.IsClass && typeof(IBlockchainSettings).IsAssignableFrom(type)))
                 .ToList();
-            var blockchainDescriptors = blockchainSettingsTypes
+            var blockchainSettings = blockchainSettingsTypes
                 .Select(t => configuration.GetSettings(t))
                 .Where(s => s != null)
                 .Cast<IBlockchainSettings>()
-                .Select(s => s.BlockchainDescriptors.TryGetValue(BlockchainKind.Mainnet, out var mainnetBlockchainDescriptor) ? mainnetBlockchainDescriptor : s.BlockchainDescriptors[BlockchainKind.Testnet])
+                .ToList();
+
+            var mainnetBlockchainDescriptors = blockchainSettings
+#pragma warning disable S3358
+                .Select(s => s.BlockchainDescriptors.TryGetValue(BlockchainKind.Mainnet, out var mainnetBlockchainDescriptor) ? mainnetBlockchainDescriptor : null)
+                .Where(d => d != null)
+#pragma warning restore S3358
                 .Cast<IBlockchainDescriptor>()
                 .ToList();
+
+            var testnetBlockchainDescriptors = blockchainSettings
+#pragma warning disable S3358
+                .Select(s => s.BlockchainDescriptors.TryGetValue(BlockchainKind.Testnet, out var testnetBlockchainDescriptor) ? testnetBlockchainDescriptor : null)
+                .Where(d => d != null)
+#pragma warning restore S3358
+                .Cast<IBlockchainDescriptor>()
+                .ToList();
+
+            var blockchainDescriptors = mainnetBlockchainDescriptors.Union(testnetBlockchainDescriptors).ToList();
 
             var providers = new List<IDexBaseService>();
             foreach (var dexDescriptor in DexDescriptors)

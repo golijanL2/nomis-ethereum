@@ -34,6 +34,14 @@ namespace Nomis.CacheProviderService.Interfaces
             string key);
 
         /// <summary>
+        /// Get string value from cache.
+        /// </summary>
+        /// <param name="key">The key.</param>
+        /// <returns>Returns string value from cache.</returns>
+        public Task<string?> GetStringFromCacheAsync(
+            string key);
+
+        /// <summary>
         /// Store data in cache.
         /// </summary>
         /// <param name="key">The key.</param>

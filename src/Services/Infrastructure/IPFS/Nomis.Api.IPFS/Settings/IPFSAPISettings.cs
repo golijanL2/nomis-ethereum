@@ -18,7 +18,7 @@ namespace Nomis.Api.IPFS.Settings
         IApiSettings
     {
         /// <inheritdoc/>
-        public bool APIEnabled { get; set; }
+        public bool APIEnabled { get; init; }
 
         /// <inheritdoc/>
         public string APIName => IPFSController.IPFSTag;

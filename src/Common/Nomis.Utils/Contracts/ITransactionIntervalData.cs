@@ -7,6 +7,7 @@
 
 using System.Numerics;
 
+// ReSharper disable InconsistentNaming
 namespace Nomis.Utils.Contracts
 {
     /// <summary>
@@ -14,6 +15,11 @@ namespace Nomis.Utils.Contracts
     /// </summary>
     public interface ITransactionIntervalData
     {
+        /// <summary>
+        /// Native token USD price.
+        /// </summary>
+        public decimal TokenUSDPrice { get; set; }
+
         /// <summary>
         /// Start date of the interval.
         /// </summary>
@@ -32,7 +38,12 @@ namespace Nomis.Utils.Contracts
         /// <summary>
         /// Tokens amount sum in the interval (native token).
         /// </summary>
-        public decimal AmountSumValue { get; }
+        public decimal AmountSumValue { get; set; }
+
+        /// <summary>
+        /// Tokens amount sum in the interval (USD).
+        /// </summary>
+        public decimal AmountSumUSDValue { get; }
 
         /// <summary>
         /// Tokens amount sum sent from the wallet in the interval.
@@ -42,7 +53,12 @@ namespace Nomis.Utils.Contracts
         /// <summary>
         /// Tokens amount sum sent from the wallet in the interval (native token).
         /// </summary>
-        public decimal AmountOutSumValue { get; }
+        public decimal AmountOutSumValue { get; set; }
+
+        /// <summary>
+        /// Tokens amount sum sent from the wallet in the interval (USD).
+        /// </summary>
+        public decimal AmountOutSumUSDValue { get; }
 
         /// <summary>
         /// Tokens amount sum received to the wallet in the interval.
@@ -52,7 +68,12 @@ namespace Nomis.Utils.Contracts
         /// <summary>
         /// Tokens amount sum received to the wallet in the interval (native token).
         /// </summary>
-        public decimal AmountInSumValue { get; }
+        public decimal AmountInSumValue { get; set; }
+
+        /// <summary>
+        /// Tokens amount sum received to the wallet in the interval (USD).
+        /// </summary>
+        public decimal AmountInSumUSDValue { get; }
 
         /// <summary>
         /// Transactions count in the interval.

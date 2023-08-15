@@ -39,6 +39,11 @@ namespace Nomis.BalanceChecker.Interfaces.Enums
         Astar = 592,
 
         /// <summary>
+        /// Patex.
+        /// </summary>
+        Patex = 789,
+
+        /// <summary>
         /// Metis Andromeda Mainnet.
         /// </summary>
         Metis = 1088,

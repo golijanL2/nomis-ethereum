@@ -7,10 +7,12 @@
 
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Nomis.Blockchain.Abstractions.Extensions;
 using Nomis.DexProviderService.Interfaces;
 using Nomis.Etherscan.Interfaces;
 using Nomis.Etherscan.Settings;
+using Nomis.Utils.Contracts;
 using Nomis.Utils.Extensions;
 
 namespace Nomis.Etherscan.Extensions
@@ -32,7 +34,23 @@ namespace Nomis.Etherscan.Extensions
             services.CheckServiceDependencies(typeof(EtherscanService), typeof(IDexProviderService));
             var configuration = serviceProvider.GetRequiredService<IConfiguration>();
             services.AddSettings<EtherscanSettings>(configuration);
+            var settings = configuration.GetSettings<EtherscanSettings>();
+            services
+                .AddSingleton<IValuePool<EtherscanService, string>>(_ => new ValuePool<EtherscanService, string>(settings.ApiKeys));
+            services
+                .AddHttpClient<EtherscanClient>(client =>
+                {
+                    client.BaseAddress = new(settings.ApiBaseUrl ?? "https://api.etherscan.io/");
+                })
+                .AddTraceLogHandler(_ => Task.FromResult(settings.UseHttpClientLogging));
             return services
+                .AddTransient<IEtherscanClient, EtherscanClient>(provider =>
+                {
+                    var apiKeysPool = provider.GetRequiredService<IValuePool<EtherscanService, string>>();
+                    var logger = provider.GetRequiredService<ILogger<EtherscanClient>>();
+                    var client = provider.GetRequiredService<IHttpClientFactory>().CreateClient(nameof(EtherscanClient));
+                    return new EtherscanClient(settings, apiKeysPool, client, logger);
+                })
                 .AddTransientInfrastructureService<IEthereumScoringService, EtherscanService>();
         }
     }

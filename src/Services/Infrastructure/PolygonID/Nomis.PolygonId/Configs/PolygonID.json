@@ -3,7 +3,7 @@
     "ApiBaseUrl": "https://polygon.nomis.cc:3001/",
     "IssuerBasicAuthUsername": "issuer",
     "IssuerBasicAuthPassword": "",
-    "IssuerDid": "did:polygonid:polygon:mumbai:2qJESmaVKpqRCG6P2V6wgYXXN49pvsP2Ti4N2opZ5F",
+    "IssuerDid": "did:polygonid:polygon:mumbai:2qP9soAvhUVmWW9D38s2L6LxMjQizdhJancKTj1SMb",
     "NomisCredentialSchema": "https://raw.githubusercontent.com/Nomis-cc/nomis-iden3/main/schemas/json/nomisScore-v1.json",
     "NomisCredentialType": "NomisScore"
   }

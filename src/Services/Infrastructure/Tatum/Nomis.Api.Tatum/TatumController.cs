@@ -7,7 +7,6 @@
 
 using System.Net.Mime;
 
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -71,7 +70,6 @@ namespace Nomis.Api.Tatum
         /// <response code="404">No data found.</response>
         /// <response code="500">Unknown internal error.</response>
         [HttpGet("rate/{currency}", Name = "GetTatumCurrentExchangeRate")]
-        [AllowAnonymous]
         [SwaggerOperation(
             OperationId = "GetTatumCurrentExchangeRate",
             Tags = new[] { TatumTag })]

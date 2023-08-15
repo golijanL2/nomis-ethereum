@@ -58,8 +58,7 @@ namespace Nomis.Greysafe
 
             response.EnsureSuccessStatusCode();
 
-            var result = await response.Content.ReadFromJsonAsync<GreysafeReportsResponse>()
-.ConfigureAwait(false) ?? throw new CustomException("Can't get wallet scam reports.");
+            var result = await response.Content.ReadFromJsonAsync<GreysafeReportsResponse>().ConfigureAwait(false) ?? throw new CustomException("Can't get wallet scam reports.");
 
             return await Result<GreysafeReportsResponse>.SuccessAsync(result, "Got wallet scam reports.").ConfigureAwait(false);
         }

@@ -40,7 +40,7 @@ namespace Nomis.Aave
             _nethereumClients = new Dictionary<AaveChain, Web3>();
             foreach (var chain in Enum.GetValues<AaveChain>())
             {
-                _nethereumClients.Add(chain, new Web3(_settings.DataFeeds?.FirstOrDefault(a => a.Blockchain == chain)?.RpcUrl ?? "http://localhost:8545")
+                _nethereumClients.Add(chain, new Web3(_settings.DataFeeds?.Find(a => a.Blockchain == chain)?.RpcUrl ?? "http://localhost:8545")
                 {
                     TransactionManager =
                     {
@@ -61,7 +61,7 @@ namespace Nomis.Aave
                 throw new InvalidAddressException(address);
             }
 
-            var contractsData = _settings.DataFeeds?.FirstOrDefault(a => a.Blockchain == blockchain);
+            var contractsData = _settings.DataFeeds?.Find(a => a.Blockchain == blockchain);
             if (!new AddressUtil().IsValidAddressLength(contractsData?.PoolContractAddress))
             {
                 throw new CustomException("Invalid contract address", statusCode: HttpStatusCode.BadRequest);

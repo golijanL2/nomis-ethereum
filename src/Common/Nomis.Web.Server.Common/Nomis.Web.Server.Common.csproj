@@ -32,7 +32,10 @@
     <ProjectReference Include="..\..\Dexes\Common\Nomis.Api.DexAggregator\Nomis.Api.DexAggregator.csproj" />
     <ProjectReference Include="..\..\Dexes\Common\Nomis.DexProviderService\Nomis.DexProviderService.csproj" />
     <ProjectReference Include="..\..\Services\Application\Common\Nomis.CurrentUserService\Nomis.CurrentUserService.csproj" />
+    <ProjectReference Include="..\..\Services\Application\Referral\Nomis.ReferralService\Nomis.ReferralService.csproj" />
     <ProjectReference Include="..\..\Services\Application\Scoring\Nomis.ScoringService\Nomis.ScoringService.csproj" />
+    <ProjectReference Include="..\..\Services\Infrastructure\Blockscout\Nomis.Api.Blockscout\Nomis.Api.Blockscout.csproj" />
+    <ProjectReference Include="..\..\Services\Infrastructure\Blockscout\Nomis.Blockscout\Nomis.Blockscout.csproj" />
     <ProjectReference Include="..\..\Services\Infrastructure\Caching\Nomis.CacheProviderService\Nomis.CacheProviderService.csproj" />
     <ProjectReference Include="..\..\Services\Infrastructure\Ceramic\Nomis.Api.Ceramic\Nomis.Api.Ceramic.csproj" />
     <ProjectReference Include="..\..\Services\Infrastructure\Ceramic\Nomis.Ceramic\Nomis.Ceramic.csproj" />
@@ -54,7 +57,9 @@
     <ProjectReference Include="..\..\Services\Infrastructure\Lending\Nomis.Aave\Nomis.Aave.csproj" />
     <ProjectReference Include="..\..\Services\Infrastructure\Lending\Nomis.Api.Aave\Nomis.Api.Aave.csproj" />
     <ProjectReference Include="..\..\Services\Infrastructure\Other\Nomis.Api.BalanceChecker\Nomis.Api.BalanceChecker.csproj" />
+    <ProjectReference Include="..\..\Services\Infrastructure\Other\Nomis.Api.MailServices\Nomis.Api.MailServices.csproj" />
     <ProjectReference Include="..\..\Services\Infrastructure\Other\Nomis.BalanceChecker\Nomis.BalanceChecker.csproj" />
+    <ProjectReference Include="..\..\Services\Infrastructure\Other\Nomis.ElasticMailServices\Nomis.ElasticMailServices.csproj" />
     <ProjectReference Include="..\..\Services\Infrastructure\PolygonID\Nomis.Api.PolygonId\Nomis.Api.PolygonId.csproj" />
     <ProjectReference Include="..\..\Services\Infrastructure\PolygonID\Nomis.PolygonId\Nomis.PolygonId.csproj" />
     <ProjectReference Include="..\..\Services\Infrastructure\Rapyd\Nomis.Api.Rapyd\Nomis.Api.Rapyd.csproj" />
@@ -67,6 +72,7 @@
     <ProjectReference Include="..\..\Services\Infrastructure\Social\Nomis.CyberConnect\Nomis.CyberConnect.csproj" />
     <ProjectReference Include="..\..\Services\Infrastructure\Tatum\Nomis.Api.Tatum\Nomis.Api.Tatum.csproj" />
     <ProjectReference Include="..\..\Services\Infrastructure\Tatum\Nomis.Tatum\Nomis.Tatum.csproj" />
+    <ProjectReference Include="..\..\Storage\Nomis.DataAccess.PostgreSql.Referral\Nomis.DataAccess.PostgreSql.Referral.csproj" />
     <ProjectReference Include="..\..\Storage\Nomis.DataAccess.PostgreSql.Scoring\Nomis.DataAccess.PostgreSql.Scoring.csproj" />
     <ProjectReference Include="..\..\Storage\Nomis.DataAccess.PostgreSql\Nomis.DataAccess.PostgreSql.csproj" />
     <ProjectReference Include="..\Nomis.Api.Common\Nomis.Api.Common.csproj" />

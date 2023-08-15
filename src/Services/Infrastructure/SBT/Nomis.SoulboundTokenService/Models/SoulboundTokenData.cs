@@ -5,7 +5,7 @@
 // </copyright>
 // ------------------------------------------------------------------------------------------------------
 
-using Nomis.SoulboundTokenService.Interfaces.Contracts;
+using Nomis.Utils.Contracts.NFT;
 
 namespace Nomis.SoulboundTokenService.Models
 {
@@ -13,7 +13,7 @@ namespace Nomis.SoulboundTokenService.Models
     /// Soulbound token data.
     /// </summary>
     public sealed class SoulboundTokenData :
-        SoulboundTokenCommonData
+        NFTCommonData
     {
         /// <summary>
         /// The contract signer wallet private key.

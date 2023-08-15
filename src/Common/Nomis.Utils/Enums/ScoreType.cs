@@ -21,6 +21,11 @@ namespace Nomis.Utils.Enums
         /// <summary>
         /// Concrete token score.
         /// </summary>
-        Token = 1
+        Token = 1,
+
+        /// <summary>
+        /// Migration score.
+        /// </summary>
+        Migration = 2
     }
 }

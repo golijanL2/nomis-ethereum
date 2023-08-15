@@ -6,7 +6,7 @@
 // ------------------------------------------------------------------------------------------------------
 
 using Nomis.SoulboundTokenService.Interfaces.Contracts;
-using Nomis.SoulboundTokenService.Interfaces.Models;
+using Nomis.Utils.Contracts.NFT;
 using Nomis.Utils.Contracts.Requests;
 using Nomis.Utils.Enums;
 using Nomis.Utils.Wrapper;
@@ -19,44 +19,95 @@ namespace Nomis.SoulboundTokenService.Interfaces.Extensions
     public static class ExtensionMethods
     {
         /// <summary>
+        /// Get the signed migration data signature.
+        /// </summary>
+        /// <typeparam name="TWalletRequest">The wallet request type.</typeparam>
+        /// <param name="service"><see cref="IScoreSoulboundTokenService"/>.</param>
+        /// <param name="request"><see cref="WalletStatsRequest"/>.</param>
+        /// <param name="mintChainId">Blockchain id in which the SBT will be minted.</param>
+        /// <param name="sbtData">The soulbound token common data.</param>
+        /// <param name="referralCode">Referral code.</param>
+        /// <param name="referrerCode">Referrer code.</param>
+        /// <returns>Returns the signed data signature.</returns>
+        public static async Task<Result<NFTSignature>> MigrationSignatureAsync<TWalletRequest>(
+            this IScoreSoulboundTokenService service,
+            TWalletRequest request,
+            ulong? mintChainId,
+            NFTCommonData? sbtData,
+            string? referralCode = "anon",
+            string? referrerCode = "nomis")
+            where TWalletRequest : WalletStatsRequest
+        {
+            var signatureResult = await Result<NFTSignature>.FailAsync(
+                new NFTSignature
+                {
+                    Signature = null
+                }, "Get token signature: Can't get signature with empty blockchain id.").ConfigureAwait(false);
+#pragma warning disable S6603 // The collection-specific "TrueForAll" method should be used instead of the "All" extension
+            if (mintChainId != null)
+#pragma warning restore S6603 // The collection-specific "TrueForAll" method should be used instead of the "All" extension
+            {
+                signatureResult = service.GetMigrationSignature(new()
+                {
+                    ScoreType = ScoreType.Migration,
+                    To = request.Address,
+                    Nonce = request.Nonce,
+                    MintChainId = (ulong)mintChainId,
+                    NFTCommonData = sbtData,
+                    Deadline = request.Deadline,
+                    ReferralCode = referralCode,
+                    ReferrerCode = referrerCode
+                });
+            }
+
+            return signatureResult;
+        }
+
+        /// <summary>
         /// Get the signed data signature.
         /// </summary>
         /// <typeparam name="TWalletRequest">The wallet request type.</typeparam>
-        /// <param name="service"><see cref="ISoulboundTokenService"/>.</param>
+        /// <param name="service"><see cref="IScoreSoulboundTokenService"/>.</param>
         /// <param name="request"><see cref="WalletStatsRequest"/>.</param>
         /// <param name="mintedScore">The wallet minted score.</param>
-        /// <param name="mintChainId">Blockchain id in which the score will be minted.</param>
+        /// <param name="mintChainId">Blockchain id in which the SBT will be minted.</param>
         /// <param name="sbtData">The soulbound token common data.</param>
         /// <param name="metadataUrl">Token metadata IPFS URL.</param>
         /// <param name="scoreChainId">Blockchain id in which the score was calculated.</param>
+        /// <param name="referralCode">Referral code.</param>
+        /// <param name="referrerCode">Referrer code.</param>
         /// <param name="criteria">Criteria to get signature.</param>
         /// <returns>Returns the signed data signature.</returns>
-        public static async Task<Result<SoulboundTokenSignature>> SignatureAsync<TWalletRequest>(
-            this ISoulboundTokenService service,
+        public static async Task<Result<NFTSignature>> SignatureAsync<TWalletRequest>(
+            this IScoreSoulboundTokenService service,
             TWalletRequest request,
             ushort mintedScore,
             ulong? mintChainId,
-            IDictionary<ScoreType, SoulboundTokenCommonData>? sbtData,
+            IDictionary<ScoreType, NFTCommonData>? sbtData,
             string? metadataUrl = null,
             ulong? scoreChainId = null,
+            string? referralCode = "anon",
+            string? referrerCode = "nomis",
             params bool?[] criteria)
             where TWalletRequest : WalletStatsRequest
         {
             if (!request.PrepareToMint)
             {
-                return await Result<SoulboundTokenSignature>.FailAsync(
-                    new SoulboundTokenSignature
+                return await Result<NFTSignature>.FailAsync(
+                    new NFTSignature
                     {
                         Signature = null
                     }, $"Can't get token signature: {nameof(request.PrepareToMint)} parameter is false.").ConfigureAwait(false);
             }
 
-            var signatureResult = await Result<SoulboundTokenSignature>.FailAsync(
-                new SoulboundTokenSignature
+            var signatureResult = await Result<NFTSignature>.FailAsync(
+                new NFTSignature
                 {
                     Signature = null
                 }, "Get token signature: Can't get signature without Risk adjusting score or empty blockchain id.").ConfigureAwait(false);
+#pragma warning disable S6603 // The collection-specific "TrueForAll" method should be used instead of the "All" extension
             if (request.PrepareToMint && mintChainId != null && (!criteria.Any() || criteria.All(c => c == true)))
+#pragma warning restore S6603 // The collection-specific "TrueForAll" method should be used instead of the "All" extension
             {
                 signatureResult = service.GetSoulboundTokenSignature(new()
                 {
@@ -66,10 +117,12 @@ namespace Nomis.SoulboundTokenService.Interfaces.Extensions
                     To = request.Address,
                     Nonce = request.Nonce,
                     MintChainId = (ulong)mintChainId,
-                    SBTCommonData = sbtData?.TryGetValue(request.ScoreType, out var value) is true ? value : null,
+                    NFTCommonData = sbtData?.TryGetValue(request.ScoreType, out var value) is true ? value : null,
                     Deadline = request.Deadline,
                     MetadataUrl = metadataUrl,
-                    ScoreChainId = scoreChainId
+                    ScoreChainId = scoreChainId,
+                    ReferralCode = referralCode,
+                    ReferrerCode = referrerCode
                 });
             }
 

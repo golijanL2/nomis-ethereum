@@ -18,6 +18,9 @@ namespace Nomis.Etherscan.Interfaces.Models
         ITransactionIntervalData
     {
         /// <inheritdoc />
+        public decimal TokenUSDPrice { get; set; }
+
+        /// <inheritdoc />
         public DateTime StartDate { get; set; }
 
         /// <inheritdoc />
@@ -27,22 +30,67 @@ namespace Nomis.Etherscan.Interfaces.Models
         [JsonIgnore]
         public BigInteger AmountSum { get; set; }
 
-        /// <inheritdoc cref="ITransactionIntervalData.AmountSum"/>
-        public decimal AmountSumValue => AmountSum.ToEth();
+        /// <inheritdoc cref="ITransactionIntervalData.AmountSumValue"/>
+        public decimal AmountSumValue
+        {
+            get
+            {
+                return AmountSum.ToNative();
+            }
+
+            set
+            {
+                AmountSum = value.FromNative();
+            }
+        }
+
+        /// <inheritdoc />
+        [JsonIgnore]
+        public decimal AmountSumUSDValue => AmountSumValue * TokenUSDPrice;
 
         /// <inheritdoc />
         [JsonIgnore]
         public BigInteger AmountOutSum { get; set; }
 
-        /// <inheritdoc cref="ITransactionIntervalData.AmountOutSum"/>
-        public decimal AmountOutSumValue => AmountOutSum.ToEth();
+        /// <inheritdoc cref="ITransactionIntervalData.AmountOutSumValue"/>
+        public decimal AmountOutSumValue
+        {
+            get
+            {
+                return AmountOutSum.ToNative();
+            }
+
+            set
+            {
+                AmountOutSum = value.FromNative();
+            }
+        }
+
+        /// <inheritdoc />
+        [JsonIgnore]
+        public decimal AmountOutSumUSDValue => AmountOutSumValue * TokenUSDPrice;
 
         /// <inheritdoc />
         [JsonIgnore]
         public BigInteger AmountInSum { get; set; }
 
-        /// <inheritdoc cref="ITransactionIntervalData.AmountInSum"/>
-        public decimal AmountInSumValue => AmountInSum.ToEth();
+        /// <inheritdoc cref="ITransactionIntervalData.AmountInSumValue"/>
+        public decimal AmountInSumValue
+        {
+            get
+            {
+                return AmountInSum.ToNative();
+            }
+
+            set
+            {
+                AmountInSum = value.FromNative();
+            }
+        }
+
+        /// <inheritdoc />
+        [JsonIgnore]
+        public decimal AmountInSumUSDValue => AmountInSumValue * TokenUSDPrice;
 
         /// <inheritdoc />
         public int Count { get; set; }

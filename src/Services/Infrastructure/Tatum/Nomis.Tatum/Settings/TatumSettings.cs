@@ -21,11 +21,11 @@ namespace Nomis.Tatum.Settings
         /// <remarks>
         /// <see href="https://docs.tatum.io/introduction/your-first-app"/>
         /// </remarks>
-        public string? ApiBaseUrl { get; set; }
+        public string? ApiBaseUrl { get; init; }
 
         /// <summary>
         /// API key.
         /// </summary>
-        public string? ApiKey { get; set; }
+        public string? ApiKey { get; init; }
     }
 }

@@ -48,10 +48,10 @@ namespace Nomis.Blockchain.Abstractions.Requests
         public virtual int SearchWidthInHours { get; set; } = 6;
 
         /// <inheritdoc />
-        /// <example>true</example>
+        /// <example>false</example>
         [FromQuery]
         [JsonPropertyOrder(-11)]
-        public virtual bool UseTokenLists { get; set; } = true;
+        public virtual bool UseTokenLists { get; set; } = false;
 
         /// <inheritdoc />
         /// <example>false</example>
@@ -84,10 +84,10 @@ namespace Nomis.Blockchain.Abstractions.Requests
         public virtual bool GetChainanalysisData { get; set; } = true;
 
         /// <inheritdoc />
-        /// <example>true</example>
+        /// <example>false</example>
         [FromQuery]
         [JsonPropertyOrder(-5)]
-        public virtual bool GetCyberConnectProtocolData { get; set; }
+        public virtual bool GetCyberConnectProtocolData { get; set; } = false;
 
         /// <inheritdoc />
         /// <example>false</example>

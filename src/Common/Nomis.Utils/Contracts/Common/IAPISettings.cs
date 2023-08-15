@@ -18,7 +18,7 @@ namespace Nomis.Utils.Contracts.Common
         /// <summary>
         /// API is enabled.
         /// </summary>
-        public bool APIEnabled { get; set; }
+        public bool APIEnabled { get; init; }
 
         /// <summary>
         /// API name.

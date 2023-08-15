@@ -41,12 +41,12 @@ namespace Nomis.IPFS
             switch (ipfsSettings.Value.Provider)
             {
                 case IPFSProvider.LocalNode:
-                    IPFSClient = new(ipfsSettings.Value.ApiBaseUrl ?? throw new ArgumentNullException(nameof(ipfsSettings.Value.ApiBaseUrl)));
+                    IPFSClient = new(ipfsSettings.Value.ApiBaseUrl ?? "https://api.web3.storage/");
                     break;
                 case IPFSProvider.Web3Storage:
                     _web3StorageClient = new HttpClient
                     {
-                        BaseAddress = new Uri(ipfsSettings.Value.ApiBaseUrl ?? throw new ArgumentNullException(nameof(ipfsSettings.Value.ApiBaseUrl)))
+                        BaseAddress = new Uri(ipfsSettings.Value.ApiBaseUrl ?? "https://api.web3.storage/")
                     };
                     _web3StorageClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {ipfsSettings.Value.ApiKey ?? throw new ArgumentNullException(nameof(ipfsSettings.Value.ApiKey))}");
                     break;

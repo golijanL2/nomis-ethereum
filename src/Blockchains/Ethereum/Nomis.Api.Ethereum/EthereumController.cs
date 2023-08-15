@@ -8,7 +8,6 @@
 using System.ComponentModel.DataAnnotations;
 using System.Net.Mime;
 
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -66,14 +65,13 @@ namespace Nomis.Api.Ethereum
         /// <remarks>
         /// Sample request:
         ///
-        ///     GET /api/v1/ethereum/wallet/0xF696AB3E4F9d52482B8350fFae67D21fda78e601/score?scoreType=0&amp;nonce=0&amp;deadline=133160867380732039
+        ///     GET /api/v1/ethereum/wallet/0xF696AB3E4F9d52482B8350fFae67D21fda78e601/score?scoreType=0&amp;nonce=0&amp;deadline=1790647549
         /// </remarks>
         /// <response code="200">Returns Nomis Score and stats.</response>
         /// <response code="400">Address not valid.</response>
         /// <response code="404">No data found.</response>
         /// <response code="500">Unknown internal error.</response>
         [HttpGet("wallet/{address}/score", Name = "GetEthereumWalletScore")]
-        [AllowAnonymous]
         [SwaggerOperation(
             OperationId = "GetEthereumWalletScore",
             Tags = new[] { EthereumTag })]
@@ -109,7 +107,6 @@ namespace Nomis.Api.Ethereum
         /// <response code="404">No data found.</response>
         /// <response code="500">Unknown internal error.</response>
         [HttpPost("wallets/score", Name = "GetEthereumWalletsScore")]
-        [AllowAnonymous]
         [SwaggerOperation(
             OperationId = "GetEthereumWalletsScore",
             Tags = new[] { EthereumTag })]
@@ -147,7 +144,6 @@ namespace Nomis.Api.Ethereum
         /// <response code="404">No data found.</response>
         /// <response code="500">Unknown internal error.</response>
         [HttpPost("wallets/score-by-file", Name = "GetEthereumWalletsScoreByFile")]
-        [AllowAnonymous]
         [SwaggerOperation(
             OperationId = "GetEthereumWalletsScoreByFile",
             Tags = new[] { EthereumTag })]

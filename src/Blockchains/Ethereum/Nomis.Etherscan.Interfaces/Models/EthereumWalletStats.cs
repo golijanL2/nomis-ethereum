@@ -43,7 +43,7 @@ namespace Nomis.Etherscan.Interfaces.Models
         public decimal NftTrading { get; set; }
 
         /// <inheritdoc/>
-        [Display(Description = "NFT worth on wallet", GroupName = "Native token")]
+        [Display(Description = "NFT relative turnover", GroupName = "Native token")]
         public decimal NftWorth { get; set; }
 
         /// <inheritdoc/>

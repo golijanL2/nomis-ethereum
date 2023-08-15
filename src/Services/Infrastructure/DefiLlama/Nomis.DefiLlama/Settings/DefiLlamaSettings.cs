@@ -21,6 +21,6 @@ namespace Nomis.DefiLlama.Settings
         /// <remarks>
         /// <see href="https://defillama.com/docs/api"/>
         /// </remarks>
-        public string? ApiBaseUrl { get; set; }
+        public string? ApiBaseUrl { get; init; }
     }
 }

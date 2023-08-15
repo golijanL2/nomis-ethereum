@@ -18,16 +18,16 @@ namespace Nomis.CacheProviderService.Settings
         /// <summary>
         /// Use Redis.
         /// </summary>
-        public bool UseRedis { get; set; }
+        public bool UseRedis { get; init; }
 
         /// <summary>
         /// Connection string.
         /// </summary>
-        public string? ConnectionString { get; set; }
+        public string? ConnectionString { get; init; }
 
         /// <summary>
         /// Redis instance name.
         /// </summary>
-        public string? InstanceName { get; set; }
+        public string? InstanceName { get; init; }
     }
 }

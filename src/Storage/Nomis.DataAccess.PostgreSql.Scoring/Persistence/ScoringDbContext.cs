@@ -30,7 +30,7 @@ namespace Nomis.DataAccess.PostgreSql.Scoring.Persistence
         /// <param name="options"><see cref="DbContextOptions"/>.</param>
         /// <param name="eventLogger"><see cref="IEventLogger"/>.</param>
         /// <param name="currentUserService"><see cref="ICurrentUserService"/>.</param>
-        /// <param name="mediator"><see cref="IMediator"/>.</param>
+        /// <param name="publisher"><see cref="IPublisher"/>.</param>
         /// <param name="entitySettings"><see cref="EntitySettings"/>.</param>
 #pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
         public ScoringDbContext(
@@ -38,9 +38,9 @@ namespace Nomis.DataAccess.PostgreSql.Scoring.Persistence
             DbContextOptions<ScoringDbContext> options,
             IEventLogger eventLogger,
             ICurrentUserService currentUserService,
-            IMediator mediator,
+            IPublisher publisher,
             IOptionsSnapshot<EntitySettings> entitySettings)
-                : base(options, eventLogger, currentUserService, mediator, entitySettings)
+                : base(options, eventLogger, currentUserService, publisher, entitySettings)
         {
         }
 

@@ -12,25 +12,12 @@ namespace Nomis.Api.Common.Settings
     /// <summary>
     /// API common settings.
     /// </summary>
-    /// <remarks>
-    /// <see href="https://github.com/stefanprodan/AspNetCoreRateLimit/wiki/IpRateLimitMiddleware#setup"/>.
-    /// </remarks>
     public class ApiCommonSettings :
         ISettings
     {
         /// <summary>
-        /// Use rate limiting.
-        /// </summary>
-        public bool UseRateLimiting { get; set; }
-
-        /// <summary>
-        /// Use Redis caching.
-        /// </summary>
-        public bool UseRedisCaching { get; set; }
-
-        /// <summary>
         /// Use Swagger caching.
         /// </summary>
-        public bool UseSwaggerCaching { get; set; }
+        public bool UseSwaggerCaching { get; init; }
     }
 }

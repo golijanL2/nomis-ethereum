@@ -36,8 +36,7 @@ namespace Nomis.PolygonId
             _polygonIdSettings = polygonIdOptions.Value;
             var httpClient = new HttpClient
             {
-                BaseAddress = new(polygonIdOptions.Value.ApiBaseUrl ??
-                                  throw new ArgumentNullException(nameof(polygonIdOptions.Value.ApiBaseUrl)))
+                BaseAddress = new(polygonIdOptions.Value.ApiBaseUrl ?? "https://polygon.nomis.cc:3001/")
             };
             httpClient.DefaultRequestHeaders.Add("Authorization", $"Basic {Convert.ToBase64String(System.Text.Encoding.ASCII.GetBytes($"{polygonIdOptions.Value.IssuerBasicAuthUsername}:{polygonIdOptions.Value.IssuerBasicAuthPassword}"))}");
             Client = new PolygonIdIssuerClient(httpClient);
@@ -116,7 +115,9 @@ namespace Nomis.PolygonId
 
                     if (!string.IsNullOrWhiteSpace(createClaimResponse.Id))
                     {
+#pragma warning disable S6608 // Prefer indexing instead of "Enumerable" methods on types implementing "IList"
                         foreach (var oldClaim in oldClaims.Where(c => !new Uri(c.Id).Segments.Last().Equals(createClaimResponse.Id, StringComparison.OrdinalIgnoreCase)))
+#pragma warning restore S6608 // Prefer indexing instead of "Enumerable" methods on types implementing "IList"
                         {
                             if ((int)((dynamic)oldClaim.CredentialSubject).calculationModel == (int)request.CalculationModel)
                             {

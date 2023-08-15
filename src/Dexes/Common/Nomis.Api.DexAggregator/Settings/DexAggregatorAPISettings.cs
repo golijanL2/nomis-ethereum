@@ -17,7 +17,7 @@ namespace Nomis.Api.DexAggregator.Settings
         IApiSettings
     {
         /// <inheritdoc/>
-        public bool APIEnabled { get; set; }
+        public bool APIEnabled { get; init; }
 
         /// <inheritdoc/>
         public string APIName => DexAggregatorController.DexAggregatorTag;

@@ -66,7 +66,12 @@ namespace Nomis.Api.Common.Middlewares
 
                 var responseModel = await ErrorResult<string>.ReturnErrorAsync(exception.Message).ConfigureAwait(false);
                 responseModel.Source = exception.TargetSite?.DeclaringType?.FullName?.Trim();
-                responseModel.Exception = exception.Message.Trim();
+
+                if (_env.IsDevelopment())
+                {
+                    responseModel.Exception = exception.Message.Trim();
+                }
+
                 responseModel.ErrorId = errorId;
                 responseModel.SupportMessage = "Provide the ErrorId to the support team for further analysis.";
                 try

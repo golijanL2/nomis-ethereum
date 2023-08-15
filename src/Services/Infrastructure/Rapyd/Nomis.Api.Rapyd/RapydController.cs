@@ -8,7 +8,6 @@
 using System.ComponentModel.DataAnnotations;
 using System.Net.Mime;
 
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -72,7 +71,6 @@ namespace Nomis.Api.Rapyd
         /// <response code="404">No data found.</response>
         /// <response code="500">Unknown internal error.</response>
         [HttpGet("customers", Name = "GetRapydCustomers")]
-        [AllowAnonymous]
         [SwaggerOperation(
             OperationId = "GetRapydCustomers",
             Tags = new[] { RapydTag })]
@@ -98,7 +96,6 @@ namespace Nomis.Api.Rapyd
         /// <response code="404">No data found.</response>
         /// <response code="500">Unknown internal error.</response>
         [HttpPost("customer", Name = "CreateRapydCustomer")]
-        [AllowAnonymous]
         [SwaggerOperation(
             OperationId = "CreateRapydCustomer",
             Tags = new[] { RapydTag })]
@@ -129,7 +126,6 @@ namespace Nomis.Api.Rapyd
         /// <response code="404">No data found.</response>
         /// <response code="500">Unknown internal error.</response>
         [HttpPost("checkout", Name = "CreateRapydPaymentCheckout")]
-        [AllowAnonymous]
         [SwaggerOperation(
             OperationId = "CreateRapydPaymentCheckout",
             Tags = new[] { RapydTag })]
@@ -161,7 +157,6 @@ namespace Nomis.Api.Rapyd
         /// <response code="404">No data found.</response>
         /// <response code="500">Unknown internal error.</response>
         [HttpGet("checkout/{checkoutId}", Name = "GetRapydCheckoutById")]
-        [AllowAnonymous]
         [SwaggerOperation(
             OperationId = "GetRapydCheckoutById",
             Tags = new[] { RapydTag })]
@@ -193,7 +188,6 @@ namespace Nomis.Api.Rapyd
         /// <response code="404">No data found.</response>
         /// <response code="500">Unknown internal error.</response>
         [HttpGet("payment-methods/{country}", Name = "GetRapydPaymentMethods")]
-        [AllowAnonymous]
         [SwaggerOperation(
             OperationId = "GetRapydPaymentMethods",
             Tags = new[] { RapydTag })]

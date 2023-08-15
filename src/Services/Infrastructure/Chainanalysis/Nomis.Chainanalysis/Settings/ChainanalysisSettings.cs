@@ -18,11 +18,11 @@ namespace Nomis.Chainanalysis.Settings
         /// <summary>
         /// API key for Chainanalysis.
         /// </summary>
-        public string? ApiKey { get; set; }
+        public string? ApiKey { get; init; }
 
         /// <summary>
         /// Chainanalysis API URL.
         /// </summary>
-        public string? ApiBaseUrl { get; set; }
+        public string? ApiBaseUrl { get; init; }
     }
 }

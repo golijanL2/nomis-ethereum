@@ -5,9 +5,10 @@
 // </copyright>
 // ------------------------------------------------------------------------------------------------------
 
+using System.Globalization;
 using System.Numerics;
 
-using EthScanNet.Lib.Models.ApiResponses.Accounts.Models;
+using Nomis.Blockchain.Abstractions.Contracts;
 
 namespace Nomis.Etherscan.Interfaces.Extensions
 {
@@ -21,7 +22,7 @@ namespace Nomis.Etherscan.Interfaces.Extensions
         /// </summary>
         /// <param name="valueInWei">Wei.</param>
         /// <returns>Returns total ETH.</returns>
-        public static decimal ToEth(this BigInteger valueInWei)
+        public static decimal ToNative(this BigInteger valueInWei)
         {
             if (valueInWei > new BigInteger(decimal.MaxValue))
             {
@@ -32,13 +33,41 @@ namespace Nomis.Etherscan.Interfaces.Extensions
         }
 
         /// <summary>
+        /// Convert native value to wei.
+        /// </summary>
+        /// <param name="value">Native value.</param>
+        /// <returns>Returns total wei.</returns>
+        public static BigInteger FromNative(this in decimal value)
+        {
+            if (value > decimal.MaxValue / 100_000_000_000_000_000)
+            {
+                return (BigInteger)(value * new decimal(100_000_000_000_000_000));
+            }
+
+            return (BigInteger)(value / 0.000_000_000_000_000_001M);
+        }
+
+        /// <summary>
+        /// Convert Wei value to ETH.
+        /// </summary>
+        /// <param name="valueInWei">Wei.</param>
+        /// <returns>Returns total ETH.</returns>
+        public static decimal ToEth(this string valueInWei)
+        {
+            return BigInteger
+                .TryParse(valueInWei, NumberStyles.AllowDecimalPoint, new NumberFormatInfo { CurrencyDecimalSeparator = "." }, out var value)
+                ? value.ToNative()
+                : 0;
+        }
+
+        /// <summary>
         /// Convert Wei value to Eth.
         /// </summary>
         /// <param name="valueInWei">Wei.</param>
         /// <returns>Returns total ETH.</returns>
         public static decimal ToEth(this decimal valueInWei)
         {
-            return new BigInteger(valueInWei).ToEth();
+            return new BigInteger(valueInWei).ToNative();
         }
 
         /// <summary>
@@ -46,9 +75,9 @@ namespace Nomis.Etherscan.Interfaces.Extensions
         /// </summary>
         /// <param name="token">Token info.</param>
         /// <returns>Returns token UID.</returns>
-        public static string GetTokenUid(this EScanTokenTransferEvent token)
+        public static string GetTokenUid(this INFTTokenTransfer token)
         {
-            return token.ContractAddress + "_" + token.TokenId;
+            return $"{token.ContractAddress}_{token.TokenId}";
         }
     }
 }

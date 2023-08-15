@@ -8,7 +8,7 @@
 using System.Text.Json.Serialization;
 
 using Nomis.Blockchain.Abstractions.Enums;
-using Nomis.SoulboundTokenService.Interfaces.Contracts;
+using Nomis.Utils.Contracts.NFT;
 using Nomis.Utils.Enums;
 
 // ReSharper disable InconsistentNaming
@@ -33,6 +33,7 @@ namespace Nomis.Blockchain.Abstractions.Contracts
         public BlockchainDescriptor(
             IBlockchainDescriptor? blockchainDescriptor)
         {
+            IsTestnet = blockchainDescriptor?.IsTestnet ?? false;
             IsEnabled = blockchainDescriptor?.IsEnabled ?? false;
             ChainId = blockchainDescriptor?.ChainId ?? 0;
             ChainName = blockchainDescriptor?.ChainName;
@@ -46,11 +47,15 @@ namespace Nomis.Blockchain.Abstractions.Contracts
             Order = blockchainDescriptor?.Order ?? 1;
             Icon = blockchainDescriptor?.Icon;
             LabelIcon = blockchainDescriptor?.LabelIcon;
-            Enabled = blockchainDescriptor?.Enabled ?? false;
+            IsHided = blockchainDescriptor?.IsHided ?? false;
             Type = blockchainDescriptor?.Type ?? BlockchainType.None;
             PlatformIds = blockchainDescriptor?.PlatformIds;
             Oracles = blockchainDescriptor?.Oracles;
         }
+
+        /// <inheritdoc cref="IBlockchainDescriptor.IsTestnet"/>
+        [JsonInclude]
+        public bool IsTestnet { get; set; }
 
         /// <inheritdoc cref="IBlockchainDescriptor.IsEnabled"/>
         [JsonInclude]
@@ -90,7 +95,7 @@ namespace Nomis.Blockchain.Abstractions.Contracts
 
         /// <inheritdoc cref="IBlockchainDescriptor.SBTData"/>
         [JsonInclude]
-        public IDictionary<ScoreType, SoulboundTokenCommonData>? SBTData { get; set; } = new Dictionary<ScoreType, SoulboundTokenCommonData>();
+        public IDictionary<ScoreType, NFTCommonData>? SBTData { get; set; } = new Dictionary<ScoreType, NFTCommonData>();
 
         /// <inheritdoc cref="IBlockchainDescriptor.NativeCurrency"/>
         [JsonInclude]
@@ -108,9 +113,9 @@ namespace Nomis.Blockchain.Abstractions.Contracts
         [JsonInclude]
         public string? LabelIcon { get; set; }
 
-        /// <inheritdoc cref="IBlockchainDescriptor.Enabled"/>
-        [JsonInclude]
-        public bool Enabled { get; set; }
+        /// <inheritdoc cref="IBlockchainDescriptor.IsHided"/>
+        [JsonIgnore]
+        public bool IsHided { get; set; }
 
         /// <inheritdoc cref="IBlockchainDescriptor.Type"/>
         [JsonInclude]

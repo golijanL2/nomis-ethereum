@@ -8,7 +8,6 @@
 using System.ComponentModel.DataAnnotations;
 using System.Net.Mime;
 
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -16,6 +15,7 @@ using Nomis.Api.Common.Swagger.Examples;
 using Nomis.SoulboundTokenService.Interfaces;
 using Nomis.SoulboundTokenService.Interfaces.Models;
 using Nomis.SoulboundTokenService.Interfaces.Requests;
+using Nomis.Utils.Contracts.NFT;
 using Nomis.Utils.Wrapper;
 using Swashbuckle.AspNetCore.Annotations;
 
@@ -42,18 +42,18 @@ namespace Nomis.Api.SoulboundToken
         internal const string SBTTag = "SBT";
 
         private readonly ILogger<SBTController> _logger;
-        private readonly IEvmSoulboundTokenService _evmSoulboundTokenService;
-        private readonly INonEvmSoulboundTokenService _nonEvmSoulboundTokenService;
+        private readonly IEvmScoreSoulboundTokenService _evmSoulboundTokenService;
+        private readonly INonEvmScoreSoulboundTokenService _nonEvmSoulboundTokenService;
 
         /// <summary>
         /// Initialize <see cref="SBTController"/>.
         /// </summary>
-        /// <param name="evmSoulboundTokenService"><see cref="IEvmSoulboundTokenService"/>.</param>
-        /// <param name="nonEvmSoulboundTokenService"><see cref="INonEvmSoulboundTokenService"/>.</param>
+        /// <param name="evmSoulboundTokenService"><see cref="IEvmScoreSoulboundTokenService"/>.</param>
+        /// <param name="nonEvmSoulboundTokenService"><see cref="INonEvmScoreSoulboundTokenService"/>.</param>
         /// <param name="logger"><see cref="ILogger{T}"/>.</param>
         public SBTController(
-            IEvmSoulboundTokenService evmSoulboundTokenService,
-            INonEvmSoulboundTokenService nonEvmSoulboundTokenService,
+            IEvmScoreSoulboundTokenService evmSoulboundTokenService,
+            INonEvmScoreSoulboundTokenService nonEvmSoulboundTokenService,
             ILogger<SBTController> logger)
         {
             _evmSoulboundTokenService = evmSoulboundTokenService;
@@ -71,19 +71,17 @@ namespace Nomis.Api.SoulboundToken
         /// <response code="404">No data found.</response>
         /// <response code="500">Unknown internal error.</response>
         [HttpPost("evm-token/signature", Name = "GetEvmSoulboundTokenSignature")]
-
-        // [AllowAnonymous]
         [SwaggerOperation(
             OperationId = "GetEvmSoulboundTokenSignature",
             Tags = new[] { SBTTag })]
-        [ProducesResponseType(typeof(Result<SoulboundTokenSignature>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(Result<NFTSignature>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ErrorResult<string>), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(ErrorResult<string>), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(RateLimitResult), StatusCodes.Status429TooManyRequests)]
         [ProducesResponseType(typeof(ErrorResult<string>), StatusCodes.Status500InternalServerError)]
         [Produces(MediaTypeNames.Application.Json)]
         public IActionResult GetEvmSoulboundTokenSignature(
-            [Required(ErrorMessage = "Request should be set"), FromBody] SoulboundTokenRequest request)
+            [Required(ErrorMessage = "Request should be set"), FromBody] ScoreSoulboundTokenRequest request)
         {
             var result = _evmSoulboundTokenService.GetSoulboundTokenSignature(request);
             return Ok(result);
@@ -99,19 +97,17 @@ namespace Nomis.Api.SoulboundToken
         /// <response code="404">No data found.</response>
         /// <response code="500">Unknown internal error.</response>
         [HttpPost("non-evm-token/signature", Name = "GetNonEvmSoulboundTokenSignature")]
-
-        // [AllowAnonymous]
         [SwaggerOperation(
             OperationId = "GetNonEvmSoulboundTokenSignature",
             Tags = new[] { SBTTag })]
-        [ProducesResponseType(typeof(Result<SoulboundTokenSignature>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(Result<NFTSignature>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ErrorResult<string>), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(ErrorResult<string>), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(RateLimitResult), StatusCodes.Status429TooManyRequests)]
         [ProducesResponseType(typeof(ErrorResult<string>), StatusCodes.Status500InternalServerError)]
         [Produces(MediaTypeNames.Application.Json)]
         public IActionResult GetNonEvmSoulboundTokenSignature(
-            [Required(ErrorMessage = "Request should be set"), FromBody] SoulboundTokenRequest request)
+            [Required(ErrorMessage = "Request should be set"), FromBody] ScoreSoulboundTokenRequest request)
         {
             var result = _nonEvmSoulboundTokenService.GetSoulboundTokenSignature(request);
             return Ok(result);
@@ -126,8 +122,6 @@ namespace Nomis.Api.SoulboundToken
         /// <response code="404">No data found.</response>
         /// <response code="500">Unknown internal error.</response>
         [HttpGet("calculation-models", Name = "GetScoringCalculationModels")]
-
-        [AllowAnonymous]
         [SwaggerOperation(
             OperationId = "GetScoringCalculationModels",
             Tags = new[] { SBTTag })]

@@ -10,6 +10,7 @@ using System.Reflection;
 
 using Nomis.Utils.Contracts.Stats;
 
+// ReSharper disable InconsistentNaming
 namespace Nomis.Utils.Contracts.Calculators
 {
     /// <summary>
@@ -88,10 +89,12 @@ namespace Nomis.Utils.Contracts.Calculators
         /// <summary>
         /// Get the intervals of funds movements on the wallet.
         /// </summary>
+        /// <param name="tokenUSDPrice">Native token USD price.</param>
         /// <param name="transactionsAmount">Transactions necessary data.</param>
         /// <param name="startDate">Start date for getting data.</param>
         /// <returns>Returns collection of <see cref="ITransactionIntervalData"/>.</returns>
         public static IEnumerable<TTransactionIntervalData> GetTurnoverIntervals(
+            decimal tokenUSDPrice,
             IEnumerable<TurnoverIntervalsData> transactionsAmount,
             DateTime startDate)
         {
@@ -116,6 +119,7 @@ namespace Nomis.Utils.Contracts.Calculators
                 {
                     result.Add(new()
                     {
+                        TokenUSDPrice = tokenUSDPrice,
                         StartDate = startDate,
                         EndDate = startDate.AddMonths(1),
                         AmountSum = amountSum,

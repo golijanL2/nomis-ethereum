@@ -31,7 +31,7 @@ namespace Nomis.Ceramic
         {
             _client = new()
             {
-                BaseAddress = new(ceramicOptions.Value.ApiBaseUrl ?? throw new ArgumentNullException(nameof(ceramicOptions.Value.ApiBaseUrl)))
+                BaseAddress = new(ceramicOptions.Value.ApiBaseUrl ?? "http://194.61.3.121:7007/")
             };
         }
 

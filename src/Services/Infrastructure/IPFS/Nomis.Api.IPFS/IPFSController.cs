@@ -8,7 +8,6 @@
 using System.Net.Mime;
 
 using Ipfs.CoreApi;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -66,7 +65,6 @@ namespace Nomis.Api.IPFS
         /// <response code="404">No data found.</response>
         /// <response code="500">Unknown internal error.</response>
         [HttpGet("download/{fileId}", Name = "IPFSDownloadFile")]
-        [AllowAnonymous]
         [SwaggerOperation(
             OperationId = "IPFSDownloadFile",
             Tags = new[] { IPFSTag })]
@@ -94,7 +92,6 @@ namespace Nomis.Api.IPFS
         /// <response code="404">No data found.</response>
         /// <response code="500">Unknown internal error.</response>
         [HttpPost("upload", Name = "IPFSUploadFile")]
-        [AllowAnonymous]
         [SwaggerOperation(
             OperationId = "IPFSUploadFile",
             Tags = new[] { IPFSTag })]

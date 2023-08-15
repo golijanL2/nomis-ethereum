@@ -9,7 +9,7 @@
 namespace Nomis.Utils.Enums
 {
     /// <summary>
-    /// Blockchain id in which the score will be minted.
+    /// Blockchain id in which the SBT will be minted.
     /// </summary>
     public enum MintChain :
         ulong
@@ -38,8 +38,13 @@ namespace Nomis.Utils.Enums
         Fantom = 250,
 
         /// <summary>
+        /// Arbitrum One.
+        /// </summary>
+        ArbitrumOne = 42161,
+
+        /// <summary>
         /// Celo Mainnet.
         /// </summary>
-        Celo = 42220
+        Celo = 42220,
     }
 }

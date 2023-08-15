@@ -18,6 +18,6 @@ namespace Nomis.Snapshot.Settings
         /// <summary>
         /// Snapshot API base address.
         /// </summary>
-        public string? ApiBaseUrl { get; set; }
+        public string? ApiBaseUrl { get; init; }
     }
 }

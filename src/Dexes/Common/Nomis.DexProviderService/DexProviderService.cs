@@ -203,14 +203,14 @@ namespace Nomis.DexProviderService
                                 {
                                     tokens = tokens
                                         .Where(t => t.ChainId?.Equals(request.Blockchain) == true
-                                                    || _blockchainDescriptors.FirstOrDefault(b => (Chain)b.ChainId == request.Blockchain)?.IsEVMCompatible != true)
+                                                    || _blockchainDescriptors.Find(b => (Chain)b.ChainId == request.Blockchain)?.IsEVMCompatible != true)
                                         .ToList();
                                 }
 
                                 var resultTokens = tokens.Select(t => new DexTokenData
                                 {
                                     Provider = tokensProvider.Provider,
-                                    ChainId = _blockchainDescriptors.FirstOrDefault(b => (Chain)b.ChainId == request.Blockchain)?.IsEVMCompatible != true
+                                    ChainId = _blockchainDescriptors.Find(b => (Chain)b.ChainId == request.Blockchain)?.IsEVMCompatible != true
                                         ? t.ChainId ?? url.Key
                                         : url.Key,
                                     Id = t.Address,
@@ -220,7 +220,9 @@ namespace Nomis.DexProviderService
                                     LogoUri = t.LogoUri
                                 });
 
+#pragma warning disable S6603 // The collection-specific "TrueForAll" method should be used instead of the "All" extension
                                 var response = resultTokens.Where(t => results.All(r => r.Id?.Equals(t.Id, StringComparison.OrdinalIgnoreCase) != true)).ToList();
+#pragma warning restore S6603 // The collection-specific "TrueForAll" method should be used instead of the "All" extension
                                 if (_tokensProvidersSettings.UseCaching && response.Any())
                                 {
                                     _logger.LogInformation("Successfully saved tokens data to cache for {TokenProvider} ({Blockchain}) tokens provider.", tokensProvider.Provider.ToString(), url.Key.ToString());
@@ -264,7 +266,7 @@ namespace Nomis.DexProviderService
             bool? isEnabled = null)
         {
             var result = _blockchainDescriptors
-                .Where(x => x.Enabled)
+                .Where(x => !x.IsHided)
                 .OrderBy(x => x.Order)
                 .ThenBy(x => x.ChainId)
                 .AsEnumerable();
@@ -372,9 +374,9 @@ namespace Nomis.DexProviderService
                         foreach (var swapPair in swapPairs)
                         {
                             swapPair.Token0 = dexTokensData?
-                                .FirstOrDefault(t => t.Id?.Equals(swapPair.Token0?.Id, StringComparison.OrdinalIgnoreCase) == true) ?? swapPair.Token0;
+                                .Find(t => t.Id?.Equals(swapPair.Token0?.Id, StringComparison.OrdinalIgnoreCase) == true) ?? swapPair.Token0;
                             swapPair.Token1 = dexTokensData?
-                                .FirstOrDefault(t => t.Id?.Equals(swapPair.Token1?.Id, StringComparison.OrdinalIgnoreCase) == true) ?? swapPair.Token1;
+                                .Find(t => t.Id?.Equals(swapPair.Token1?.Id, StringComparison.OrdinalIgnoreCase) == true) ?? swapPair.Token1;
                         }
                     }
 

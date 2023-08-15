@@ -101,6 +101,18 @@ namespace Nomis.Utils.Contracts.Stats
                     return 19.48 / 100;
                 case ScoringCalculationModel.Halo:
                     return 24.37 / 100;
+                case ScoringCalculationModel.Rubic:
+                    return 26.62 / 100;
+                case ScoringCalculationModel.HederaSybilPrevention:
+                    return 26.02 / 100;
+                case ScoringCalculationModel.HederaDeFi:
+                    return 17.02 / 100;
+                case ScoringCalculationModel.HederaNFT:
+                    return 16.71 / 100;
+                case ScoringCalculationModel.HederaReputation:
+                    return 12.5 / 100;
+                case ScoringCalculationModel.ZkSyncEra:
+                    return 30.97 / 100;
                 case ScoringCalculationModel.CommonV1:
                 default:
                     return 32.34 / 100;
@@ -123,6 +135,28 @@ namespace Nomis.Utils.Contracts.Stats
                         < 1 => 18.59,
                         < 12 => 57.43,
                         < 24 => 75.79,
+                        _ => 100
+                    };
+                case ScoringCalculationModel.Rubic:
+                case ScoringCalculationModel.HederaSybilPrevention:
+                case ScoringCalculationModel.HederaDeFi:
+                case ScoringCalculationModel.HederaNFT:
+                case ScoringCalculationModel.HederaReputation:
+                    return walletAgeMonths switch
+                    {
+                        0 => 6.1,
+                        < 1 => 20.91,
+                        < 12 => 57.43,
+                        < 24 => 75.79,
+                        _ => 100
+                    };
+                case ScoringCalculationModel.ZkSyncEra:
+                    return walletAgeMonths switch
+                    {
+                        0 => 7.6,
+                        < 1 => 14.93,
+                        < 6 => 64.6,
+                        < 12 => 75.79,
                         _ => 100
                     };
                 case ScoringCalculationModel.CommonV1:

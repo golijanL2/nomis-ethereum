@@ -44,7 +44,7 @@ namespace Nomis.BalanceChecker
             _nethereumClients = new Dictionary<BalanceCheckerChain, Web3>();
             foreach (var chain in Enum.GetValues<BalanceCheckerChain>())
             {
-                _nethereumClients.Add(chain, new Web3(_settings.DataFeeds?.FirstOrDefault(a => a.Blockchain == chain)?.RpcUrl ?? "http://localhost:8545")
+                _nethereumClients.Add(chain, new Web3(_settings.DataFeeds?.Find(a => a.Blockchain == chain)?.RpcUrl ?? "http://localhost:8545")
                 {
                     TransactionManager =
                     {
@@ -69,7 +69,7 @@ namespace Nomis.BalanceChecker
                 return await Result<IEnumerable<BalanceCheckerTokenInfo>>.FailAsync("There is an invalid token address in the request.").ConfigureAwait(false);
             }
 
-            var contractsData = _settings.DataFeeds.FirstOrDefault(a => a.Blockchain == request.Blockchain);
+            var contractsData = _settings.DataFeeds.Find(a => a.Blockchain == request.Blockchain);
             if (!new AddressUtil().IsValidAddressLength(contractsData?.ContractAddress))
             {
                 return await Result<IEnumerable<BalanceCheckerTokenInfo>>.FailAsync("Invalid contract address.").ConfigureAwait(false);
@@ -99,7 +99,7 @@ namespace Nomis.BalanceChecker
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogError(ex, "There is an error when calling smart-contract for {Blockchain}", request.Blockchain);
+                    _logger.LogWarning(ex, "There is an error when calling smart-contract for {Blockchain}", request.Blockchain);
                     foreach (string tokenAddress in tokenAddresses)
                     {
                         try
@@ -110,7 +110,7 @@ namespace Nomis.BalanceChecker
                         }
                         catch (Exception e)
                         {
-                            _logger.LogError(e, "There is an error when calling smart-contract for {Blockchain} with address {Address}", request.Blockchain, tokenAddress);
+                            _logger.LogWarning(e, "There is an error when calling smart-contract for {Blockchain} with address {Address} and wallet {Wallet}. Calculated {TokensCount}", request.Blockchain, tokenAddress, request.Owner, tokenInfos.Count);
                         }
                     }
 

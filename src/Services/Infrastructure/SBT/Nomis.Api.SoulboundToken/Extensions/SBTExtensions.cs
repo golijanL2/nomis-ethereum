@@ -15,6 +15,7 @@ namespace Nomis.Api.SoulboundToken.Extensions
     /// <summary>
     /// SBT extension methods.
     /// </summary>
+    // ReSharper disable once InconsistentNaming
     public static class SBTExtensions
     {
         /// <summary>
@@ -25,7 +26,7 @@ namespace Nomis.Api.SoulboundToken.Extensions
         /// <returns>Returns <see cref="IScoringOptionsBuilder"/>.</returns>
         public static IScoringOptionsBuilder WithEvmSoulboundTokenService<TEvmSoulboundTokenServiceRegistrar>(
             this IScoringOptionsBuilder optionsBuilder)
-            where TEvmSoulboundTokenServiceRegistrar : IEvmSoulboundTokenServiceRegistrar, new()
+            where TEvmSoulboundTokenServiceRegistrar : IEvmScoreSoulboundTokenServiceRegistrar, new()
         {
             return optionsBuilder
                 .With<SBTAPISettings, TEvmSoulboundTokenServiceRegistrar>();
@@ -39,7 +40,7 @@ namespace Nomis.Api.SoulboundToken.Extensions
         /// <returns>Returns <see cref="IScoringOptionsBuilder"/>.</returns>
         public static IScoringOptionsBuilder WithNonEvmSoulboundTokenService<TNonEvmSoulboundTokenServiceRegistrar>(
             this IScoringOptionsBuilder optionsBuilder)
-            where TNonEvmSoulboundTokenServiceRegistrar : INonEvmSoulboundTokenServiceRegistrar, new()
+            where TNonEvmSoulboundTokenServiceRegistrar : INonEvmScoreSoulboundTokenServiceRegistrar, new()
         {
             return optionsBuilder
                 .With<SBTAPISettings, TNonEvmSoulboundTokenServiceRegistrar>();

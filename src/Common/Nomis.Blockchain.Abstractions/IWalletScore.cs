@@ -38,6 +38,12 @@ namespace Nomis.Blockchain.Abstractions
         public ScoreType ScoreType { get; }
 
         /// <summary>
+        /// Migrate data.
+        /// </summary>
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public MigrationData? MigrationData { get; init; }
+
+        /// <summary>
         /// Mint data.
         /// </summary>
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
@@ -48,6 +54,18 @@ namespace Nomis.Blockchain.Abstractions
         /// </summary>
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public DIDData? DIDData { get; init; }
+
+        /// <summary>
+        /// Referral code.
+        /// </summary>
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public string? ReferralCode { get; init; }
+
+        /// <summary>
+        /// Referrer code.
+        /// </summary>
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public string? ReferrerCode { get; init; }
 
         /// <summary>
         /// Additional stat data used in score calculations.

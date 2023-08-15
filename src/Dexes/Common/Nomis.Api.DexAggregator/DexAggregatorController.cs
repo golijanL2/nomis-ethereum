@@ -63,7 +63,6 @@ namespace Nomis.Api.DexAggregator
         /// <response code="404">No data found.</response>
         /// <response code="500">Unknown internal error.</response>
         [HttpGet("stablecoins", Name = "DexGetStablecoins")]
-        [AllowAnonymous]
         [SwaggerOperation(
             OperationId = "DexGetStablecoins",
             Tags = new[] { DexAggregatorTag })]
@@ -105,7 +104,7 @@ namespace Nomis.Api.DexAggregator
             DexProvider provider = DexProvider.None,
             bool? isEnabled = null)
         {
-            var result = _dexProviderService.ProvidersData(provider, blockchain);
+            var result = _dexProviderService.ProvidersData(provider, blockchain, isEnabled);
             return Ok(result);
         }
 
@@ -119,7 +118,6 @@ namespace Nomis.Api.DexAggregator
         /// <response code="404">No data found.</response>
         /// <response code="500">Unknown internal error.</response>
         [HttpGet("tokens", Name = "TokensData")]
-        [AllowAnonymous]
         [SwaggerOperation(
             OperationId = "TokensData",
             Tags = new[] { DexAggregatorTag })]
@@ -173,7 +171,6 @@ namespace Nomis.Api.DexAggregator
         /// <response code="404">No data found.</response>
         /// <response code="500">Unknown internal error.</response>
         [HttpGet("swap-pairs", Name = "DexAggregatorBlockchainSwapPairs")]
-        [AllowAnonymous]
         [SwaggerOperation(
             OperationId = "DexAggregatorBlockchainSwapPairs",
             Tags = new[] { DexAggregatorTag })]

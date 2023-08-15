@@ -25,7 +25,7 @@ namespace Nomis.ScoringService.Extensions
             this IServiceCollection services)
         {
             return services
-                .AddScopedApplicationService<IScoringService, ScoringService>();
+                .AddTransientApplicationService<IScoringService, ScoringService>();
         }
     }
 }

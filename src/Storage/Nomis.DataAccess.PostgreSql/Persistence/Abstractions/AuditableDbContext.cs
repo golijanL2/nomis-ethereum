@@ -28,7 +28,7 @@ namespace Nomis.DataAccess.PostgreSql.Persistence.Abstractions
     {
         private readonly IEventLogger _eventLogger;
         private readonly ICurrentUserService _currentUserService;
-        private readonly IMediator _mediator;
+        private readonly IPublisher _publisher;
         private readonly IOptionsSnapshot<EntitySettings> _entitySettings;
 
         /// <summary>
@@ -37,7 +37,7 @@ namespace Nomis.DataAccess.PostgreSql.Persistence.Abstractions
         /// <param name="options"><see cref="DbContextOptions"/>.</param>
         /// <param name="eventLogger"><see cref="IEventLogger"/>.</param>
         /// <param name="currentUserService"><see cref="ICurrentUserService"/>.</param>
-        /// <param name="mediator"><see cref="IMediator"/>.</param>
+        /// <param name="publisher"><see cref="IPublisher"/>.</param>
         /// <param name="entitySettings"><see cref="EntitySettings"/>.</param>
 #pragma warning disable CS8618
         protected AuditableDbContext(
@@ -45,13 +45,13 @@ namespace Nomis.DataAccess.PostgreSql.Persistence.Abstractions
             DbContextOptions options,
             IEventLogger eventLogger,
             ICurrentUserService currentUserService,
-            IMediator mediator,
+            IPublisher publisher,
             IOptionsSnapshot<EntitySettings> entitySettings)
             : base(options)
         {
             _eventLogger = eventLogger ?? throw new ArgumentNullException(nameof(eventLogger));
             _currentUserService = currentUserService ?? throw new ArgumentNullException(nameof(currentUserService));
-            _mediator = mediator ?? throw new ArgumentNullException(nameof(mediator));
+            _publisher = publisher ?? throw new ArgumentNullException(nameof(publisher));
             _entitySettings = entitySettings ?? throw new ArgumentNullException(nameof(entitySettings));
         }
 
@@ -84,13 +84,13 @@ namespace Nomis.DataAccess.PostgreSql.Persistence.Abstractions
         /// <inheritdoc cref="IAuditableDbContext"/>
         public new virtual async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
         {
-            return await this.SaveChangesWithAuditAndPublishEventsAsync(_eventLogger, _mediator, _currentUserService, _entitySettings, cancellationToken).ConfigureAwait(false);
+            return await this.SaveChangesWithAuditAndPublishEventsAsync(_eventLogger, _publisher, _currentUserService, _entitySettings, cancellationToken).ConfigureAwait(false);
         }
 
         /// <inheritdoc cref="ISupportsSavingChanges.SaveChanges"/>
         public override int SaveChanges()
         {
-            return this.SaveChangesWithAuditAndPublishEvents(_eventLogger, _mediator, _currentUserService, _entitySettings);
+            return this.SaveChangesWithAuditAndPublishEvents(_eventLogger, _publisher, _currentUserService, _entitySettings);
         }
 
         /// <inheritdoc/>

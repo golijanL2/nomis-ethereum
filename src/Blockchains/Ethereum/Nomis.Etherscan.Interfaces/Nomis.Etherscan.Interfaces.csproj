@@ -8,10 +8,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Etherscan.Net" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\..\..\Dexes\Common\Nomis.Dex.Abstractions\Nomis.Dex.Abstractions.csproj" />
     <ProjectReference Include="..\..\..\Services\Infrastructure\Hapi\Nomis.HapiExplorer.Interfaces\Nomis.HapiExplorer.Interfaces.csproj" />
     <ProjectReference Include="..\..\..\Services\Infrastructure\Lending\Nomis.Aave.Interfaces\Nomis.Aave.Interfaces.csproj" />

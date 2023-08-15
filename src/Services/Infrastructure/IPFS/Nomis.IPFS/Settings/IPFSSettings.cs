@@ -20,19 +20,19 @@ namespace Nomis.IPFS.Settings
         ISettings
     {
         /// <inheritdoc cref="IPFSProvider"/>
-        public IPFSProvider Provider { get; set; } = IPFSProvider.LocalNode;
+        public IPFSProvider Provider { get; init; } = IPFSProvider.LocalNode;
 
         /// <summary>
         /// API key.
         /// </summary>
-        public string? ApiKey { get; set; }
+        public string? ApiKey { get; init; }
 
         /// <summary>
         /// API base URL.
         /// </summary>
-        public string? ApiBaseUrl { get; set; }
+        public string? ApiBaseUrl { get; init; }
 
         /// <inheritdoc />
-        public string? IpfsGatewayUrlTemplate { get; set; }
+        public string? IpfsGatewayUrlTemplate { get; init; }
     }
 }

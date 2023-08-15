@@ -17,7 +17,7 @@ namespace Nomis.Api.Rapyd.Settings
         IApiSettings
     {
         /// <inheritdoc/>
-        public bool APIEnabled { get; set; }
+        public bool APIEnabled { get; init; }
 
         /// <inheritdoc/>
         public string APIName => RapydController.RapydTag;

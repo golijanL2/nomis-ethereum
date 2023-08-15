@@ -7,7 +7,6 @@
 
 using System.Net.Mime;
 
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -64,7 +63,6 @@ namespace Nomis.Api.DeFi
         /// <response code="404">No data found.</response>
         /// <response code="500">Unknown internal error.</response>
         [HttpGet("chains", Name = "DeFiChains")]
-        [AllowAnonymous]
         [SwaggerOperation(
             OperationId = "DeFiChains",
             Tags = new[] { DeFiTag })]
@@ -95,7 +93,6 @@ namespace Nomis.Api.DeFi
         /// <response code="404">No data found.</response>
         /// <response code="500">Unknown internal error.</response>
         [HttpPost("shields", Name = "DeFiShields")]
-        [AllowAnonymous]
         [SwaggerOperation(
             OperationId = "DeFiShields",
             Tags = new[] { DeFiTag })]

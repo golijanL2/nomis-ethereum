@@ -16,6 +16,6 @@ namespace Nomis.IPFS.Interfaces.Settings
         /// <summary>
         /// IPFS gateway URL template.
         /// </summary>
-        public string? IpfsGatewayUrlTemplate { get; set; }
+        public string? IpfsGatewayUrlTemplate { get; init; }
     }
 }

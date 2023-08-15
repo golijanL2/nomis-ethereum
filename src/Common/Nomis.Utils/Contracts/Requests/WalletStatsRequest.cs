@@ -6,6 +6,7 @@
 // ------------------------------------------------------------------------------------------------------
 
 using Microsoft.AspNetCore.Mvc;
+using Nomis.Utils.Contracts.Common;
 using Nomis.Utils.Contracts.Properties;
 using Nomis.Utils.Enums;
 
@@ -15,7 +16,8 @@ namespace Nomis.Utils.Contracts.Requests
     /// Request for getting the wallet stats.
     /// </summary>
     public class WalletStatsRequest :
-        IHasAddress
+        IHasAddress,
+        IHasMintChain
     {
         private string _address = string.Empty;
         private string? _tokenAddress;
@@ -50,23 +52,23 @@ namespace Nomis.Utils.Contracts.Requests
         /// <summary>
         /// Verifying deadline block timestamp.
         /// </summary>
-        /// <example>133160867380732039</example>
+        /// <example>1790647549</example>
         [FromQuery(Name = "deadline")]
         public ulong Deadline { get; set; }
 
         /// <summary>
         /// Scoring calculation model.
         /// </summary>
-        /// <example>0</example>
+        /// <example>11</example>
         [FromQuery(Name = "calculationModel")]
-        public ScoringCalculationModel CalculationModel { get; set; } = ScoringCalculationModel.CommonV1;
+        public virtual ScoringCalculationModel CalculationModel { get; set; } = ScoringCalculationModel.CommonV3;
 
         /// <summary>
         /// Score type.
         /// </summary>
         /// <example>0</example>
         [FromQuery(Name = "scoreType")]
-        public ScoreType ScoreType { get; set; } = ScoreType.Finance;
+        public virtual ScoreType ScoreType { get; set; } = ScoreType.Finance;
 
         /// <summary>
         /// Token contract address.
@@ -76,7 +78,7 @@ namespace Nomis.Utils.Contracts.Requests
         /// </remarks>
         /// <example>null</example>
         [FromQuery(Name = "tokenAddress")]
-        public string? TokenAddress
+        public virtual string? TokenAddress
         {
             get
             {
@@ -92,25 +94,26 @@ namespace Nomis.Utils.Contracts.Requests
         /// <summary>
         /// Prepare data to mint.
         /// </summary>
-        /// <example>true</example>
+        /// <example>false</example>
         [FromQuery(Name = "prepareToMint")]
-        public bool PrepareToMint { get; set; } = true;
+        public bool PrepareToMint { get; set; } = false;
 
         /// <summary>
-        /// Blockchain in which the score will be minted.
-        /// </summary>
-        /// <example>0</example>
-        [FromQuery]
-        public MintChain MintChain { get; set; } = MintChain.Native;
-
-        /// <summary>
-        /// Blockchain type in which the score will be minted.
+        /// Referrer code from another wallet.
         /// </summary>
         /// <remarks>
-        /// Uses only if `MintChain = 0 (Native)`.
+        /// If set, the reward will be distributed for the wallet that owns the referrer code.
         /// </remarks>
+        public string? ReferrerCode { get; set; }
+
+        /// <inheritdoc />
+        /// <example>0</example>
+        [FromQuery]
+        public virtual MintChain MintChain { get; set; } = MintChain.Native;
+
+        /// <inheritdoc />
         /// <example>0</example>
         [FromQuery(Name = "mintBlockchainType")]
-        public MintChainType MintBlockchainType { get; set; } = MintChainType.Mainnet;
+        public virtual MintChainType MintBlockchainType { get; set; } = MintChainType.Mainnet;
     }
 }

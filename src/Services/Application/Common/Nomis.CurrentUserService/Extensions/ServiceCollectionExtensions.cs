@@ -24,7 +24,7 @@ namespace Nomis.CurrentUserService.Extensions
         public static IServiceCollection AddCurrentUserService(this IServiceCollection services)
         {
             return services
-                .AddScopedApplicationService<ICurrentUserService, CurrentUserService>();
+                .AddTransientApplicationService<ICurrentUserService, CurrentUserService>();
         }
     }
 }

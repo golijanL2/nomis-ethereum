@@ -21,6 +21,6 @@ namespace Nomis.Ceramic.Settings
         /// <remarks>
         /// <see href="https://developers.ceramic.network/run/nodes/available/#ceramic-nodes"/>
         /// </remarks>
-        public string? ApiBaseUrl { get; set; }
+        public string? ApiBaseUrl { get; init; }
     }
 }

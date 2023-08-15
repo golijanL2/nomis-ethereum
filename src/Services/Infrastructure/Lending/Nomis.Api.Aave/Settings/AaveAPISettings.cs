@@ -17,7 +17,7 @@ namespace Nomis.Api.Aave.Settings
         IApiSettings
     {
         /// <inheritdoc/>
-        public bool APIEnabled { get; set; }
+        public bool APIEnabled { get; init; }
 
         /// <inheritdoc/>
         public string APIName => AaveController.AaveTag;

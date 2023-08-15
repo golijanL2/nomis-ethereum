@@ -18,6 +18,6 @@ namespace Nomis.CyberConnect.Settings
         /// <summary>
         /// CyberConnect API base address.
         /// </summary>
-        public string? ApiBaseUrl { get; set; }
+        public string? ApiBaseUrl { get; init; }
     }
 }

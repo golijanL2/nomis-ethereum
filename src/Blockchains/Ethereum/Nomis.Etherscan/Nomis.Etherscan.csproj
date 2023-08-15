@@ -21,8 +21,8 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\..\Dexes\Common\Nomis.DexProviderService.Interfaces\Nomis.DexProviderService.Interfaces.csproj" />
+    <ProjectReference Include="..\..\..\Services\Infrastructure\Blockscout\Nomis.Blockscout.Interfaces\Nomis.Blockscout.Interfaces.csproj" />
     <ProjectReference Include="..\..\..\Services\Infrastructure\Hapi\Nomis.HapiExplorer.Interfaces\Nomis.HapiExplorer.Interfaces.csproj" />
-    <ProjectReference Include="..\..\..\Services\Application\Scoring\Nomis.ScoringService.Interfaces\Nomis.ScoringService.Interfaces.csproj" />
     <ProjectReference Include="..\..\..\Services\Infrastructure\Lending\Nomis.Aave.Interfaces\Nomis.Aave.Interfaces.csproj" />
     <ProjectReference Include="..\..\..\Services\Infrastructure\Snapshot\Nomis.Snapshot.Interfaces\Nomis.Snapshot.Interfaces.csproj" />
     <ProjectReference Include="..\..\..\Services\Infrastructure\DefiLlama\Nomis.DefiLlama.Interfaces\Nomis.DefiLlama.Interfaces.csproj" />

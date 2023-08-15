@@ -20,14 +20,14 @@ namespace Nomis.Tally.Settings
         /// <summary>
         /// Tally API key.
         /// </summary>
-        public string? ApiKey { get; set; }
+        public string? ApiKey { get; init; }
 
         /// <summary>
         /// Tally API base address.
         /// </summary>
-        public string? ApiBaseUrl { get; set; }
+        public string? ApiBaseUrl { get; init; }
 
         /// <inheritdoc />
-        public IList<ulong> SupportedChainIds { get; set; } = new List<ulong>();
+        public IList<ulong> SupportedChainIds { get; init; } = new List<ulong>();
     }
 }

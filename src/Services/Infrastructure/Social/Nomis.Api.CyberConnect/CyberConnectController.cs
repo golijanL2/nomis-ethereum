@@ -7,7 +7,6 @@
 
 using System.Net.Mime;
 
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -32,7 +31,7 @@ namespace Nomis.Api.CyberConnect
         /// <summary>
         /// Base path for routing.
         /// </summary>
-        internal const string BasePath = "api/v{version:apiVersion}/cyber-connect";
+        internal const string BasePath = "api/v{version:apiVersion}/cyberconnect";
 
         /// <summary>
         /// Common tag for CyberConnect actions.
@@ -63,14 +62,13 @@ namespace Nomis.Api.CyberConnect
         /// <remarks>
         /// Sample request:
         ///
-        ///     POST /api/v1/cyber-connect/wallet/handle
+        ///     POST /api/v1/cyberconnect/wallet/handle
         /// </remarks>
         /// <response code="200">Returns CyberConnect handle.</response>
         /// <response code="400">Request not valid.</response>
         /// <response code="404">No data found.</response>
         /// <response code="500">Unknown internal error.</response>
         [HttpPost("wallet/handle", Name = "CyberConnectHandle")]
-        [AllowAnonymous]
         [SwaggerOperation(
             OperationId = "CyberConnectHandle",
             Tags = new[] { CyberConnectTag })]
@@ -101,7 +99,6 @@ namespace Nomis.Api.CyberConnect
         /// <response code="404">No data found.</response>
         /// <response code="500">Unknown internal error.</response>
         [HttpPost("handle/profile", Name = "CyberConnectProfile")]
-        [AllowAnonymous]
         [SwaggerOperation(
             OperationId = "CyberConnectProfile",
             Tags = new[] { CyberConnectTag })]
@@ -132,7 +129,6 @@ namespace Nomis.Api.CyberConnect
         /// <response code="404">No data found.</response>
         /// <response code="500">Unknown internal error.</response>
         [HttpPost("handle/subscribings", Name = "CyberConnectSubscribings")]
-        [AllowAnonymous]
         [SwaggerOperation(
             OperationId = "CyberConnectSubscribings",
             Tags = new[] { CyberConnectTag })]
@@ -163,7 +159,6 @@ namespace Nomis.Api.CyberConnect
         /// <response code="404">No data found.</response>
         /// <response code="500">Unknown internal error.</response>
         [HttpPost("wallet/likes", Name = "CyberConnectLikes")]
-        [AllowAnonymous]
         [SwaggerOperation(
             OperationId = "CyberConnectLikes",
             Tags = new[] { CyberConnectTag })]
@@ -194,7 +189,6 @@ namespace Nomis.Api.CyberConnect
         /// <response code="404">No data found.</response>
         /// <response code="500">Unknown internal error.</response>
         [HttpPost("handle/essences", Name = "CyberConnectEssences")]
-        [AllowAnonymous]
         [SwaggerOperation(
             OperationId = "CyberConnectEssences",
             Tags = new[] { CyberConnectTag })]

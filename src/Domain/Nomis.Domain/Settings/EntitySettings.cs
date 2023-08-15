@@ -22,6 +22,6 @@ namespace Nomis.Domain.Settings
         /// <remarks>
         /// Using for <see cref="ISoftDelete"/>.
         /// </remarks>
-        public bool SoftDeleteEnabled { get; set; } = true;
+        public bool SoftDeleteEnabled { get; init; } = true;
     }
 }

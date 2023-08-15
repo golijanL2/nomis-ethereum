@@ -79,6 +79,19 @@ namespace Nomis.Blockchain.Abstractions.Stats
                 case ScoringCalculationModel.Halo:
                     return 15.93 / 100;
                 case ScoringCalculationModel.CommonV2:
+                case ScoringCalculationModel.CommonV3:
+                    return 6.65 / 100;
+                case ScoringCalculationModel.Rubic:
+                    return 2.28 / 100;
+                case ScoringCalculationModel.HederaSybilPrevention:
+                    return 3.92 / 100;
+                case ScoringCalculationModel.HederaDeFi:
+                    return 4.88 / 100;
+                case ScoringCalculationModel.HederaNFT:
+                    return 30.15 / 100;
+                case ScoringCalculationModel.HederaReputation:
+                    return 12.5 / 100;
+                case ScoringCalculationModel.ZkSyncEra:
                     return 6.65 / 100;
                 case ScoringCalculationModel.CommonV1:
                 default:
@@ -96,7 +109,15 @@ namespace Nomis.Blockchain.Abstractions.Stats
                 case ScoringCalculationModel.XDEFI:
                 case ScoringCalculationModel.Halo:
                 case ScoringCalculationModel.CommonV2:
+                case ScoringCalculationModel.CommonV3:
+                case ScoringCalculationModel.Rubic:
                     return 45.72 / 100;
+                case ScoringCalculationModel.HederaSybilPrevention:
+                case ScoringCalculationModel.HederaDeFi:
+                case ScoringCalculationModel.HederaNFT:
+                case ScoringCalculationModel.HederaReputation:
+                case ScoringCalculationModel.ZkSyncEra:
+                    return 53.96 / 100;
                 case ScoringCalculationModel.CommonV1:
                 default:
                     return 6.52 / 100;
@@ -113,7 +134,15 @@ namespace Nomis.Blockchain.Abstractions.Stats
                 case ScoringCalculationModel.XDEFI:
                 case ScoringCalculationModel.Halo:
                 case ScoringCalculationModel.CommonV2:
+                case ScoringCalculationModel.CommonV3:
+                case ScoringCalculationModel.Rubic:
                     return 22.33 / 100;
+                case ScoringCalculationModel.HederaSybilPrevention:
+                case ScoringCalculationModel.HederaDeFi:
+                case ScoringCalculationModel.HederaNFT:
+                case ScoringCalculationModel.HederaReputation:
+                case ScoringCalculationModel.ZkSyncEra:
+                    return 16.34 / 100;
                 case ScoringCalculationModel.CommonV1:
                 default:
                     return 16.38 / 100;
@@ -130,7 +159,15 @@ namespace Nomis.Blockchain.Abstractions.Stats
                 case ScoringCalculationModel.XDEFI:
                 case ScoringCalculationModel.Halo:
                 case ScoringCalculationModel.CommonV2:
+                case ScoringCalculationModel.CommonV3:
+                case ScoringCalculationModel.Rubic:
                     return 31.95 / 100;
+                case ScoringCalculationModel.HederaSybilPrevention:
+                case ScoringCalculationModel.HederaDeFi:
+                case ScoringCalculationModel.HederaNFT:
+                case ScoringCalculationModel.HederaReputation:
+                case ScoringCalculationModel.ZkSyncEra:
+                    return 29.7 / 100;
                 case ScoringCalculationModel.CommonV1:
                 default:
                     return 23.75 / 100;
@@ -148,6 +185,13 @@ namespace Nomis.Blockchain.Abstractions.Stats
                 case ScoringCalculationModel.XDEFI:
                 case ScoringCalculationModel.Halo:
                 case ScoringCalculationModel.CommonV2:
+                case ScoringCalculationModel.CommonV3:
+                case ScoringCalculationModel.Rubic:
+                case ScoringCalculationModel.HederaSybilPrevention:
+                case ScoringCalculationModel.HederaDeFi:
+                case ScoringCalculationModel.HederaNFT:
+                case ScoringCalculationModel.HederaReputation:
+                case ScoringCalculationModel.ZkSyncEra:
                     return value switch
                     {
                         <= 2 => 11.89,
@@ -178,6 +222,13 @@ namespace Nomis.Blockchain.Abstractions.Stats
                 case ScoringCalculationModel.XDEFI:
                 case ScoringCalculationModel.Halo:
                 case ScoringCalculationModel.CommonV2:
+                case ScoringCalculationModel.CommonV3:
+                case ScoringCalculationModel.Rubic:
+                case ScoringCalculationModel.HederaSybilPrevention:
+                case ScoringCalculationModel.HederaDeFi:
+                case ScoringCalculationModel.HederaNFT:
+                case ScoringCalculationModel.HederaReputation:
+                case ScoringCalculationModel.ZkSyncEra:
                     return value switch
                     {
                         <= 2 => 11.89,
@@ -209,6 +260,13 @@ namespace Nomis.Blockchain.Abstractions.Stats
                 case ScoringCalculationModel.XDEFI:
                 case ScoringCalculationModel.Halo:
                 case ScoringCalculationModel.CommonV2:
+                case ScoringCalculationModel.CommonV3:
+                case ScoringCalculationModel.Rubic:
+                case ScoringCalculationModel.HederaSybilPrevention:
+                case ScoringCalculationModel.HederaDeFi:
+                case ScoringCalculationModel.HederaNFT:
+                case ScoringCalculationModel.HederaReputation:
+                case ScoringCalculationModel.ZkSyncEra:
                     return value switch
                     {
                         <= 0.5M => 14.7,

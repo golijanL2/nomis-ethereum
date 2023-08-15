@@ -18,11 +18,11 @@ namespace Nomis.HapiExplorer.Settings
         /// <summary>
         /// HAPI explorer API URL.
         /// </summary>
-        public string? ApiBaseUrl { get; set; }
+        public string? ApiBaseUrl { get; init; }
 
         /// <summary>
         /// Blockchain provider URL.
         /// </summary>
-        public string? BlockchainProviderUrl { get; set; }
+        public string? BlockchainProviderUrl { get; init; }
     }
 }

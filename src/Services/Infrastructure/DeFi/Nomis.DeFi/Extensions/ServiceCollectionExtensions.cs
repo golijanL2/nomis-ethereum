@@ -37,7 +37,7 @@ namespace Nomis.DeFi.Extensions
             {
                 var graphQlOptions = new GraphQLHttpClientOptions
                 {
-                    EndPoint = new(settings.ApiBaseUrl!)
+                    EndPoint = new(settings.ApiBaseUrl ?? "https://public-api.de.fi/graphql")
                 };
 
                 var client = new DeFiGraphQLClient(graphQlOptions, new SystemTextJsonSerializer());

@@ -11,6 +11,7 @@ using Nomis.SoulboundTokenService.Interfaces;
 using Nomis.SoulboundTokenService.Settings;
 using Nomis.Utils.Extensions;
 
+// ReSharper disable InconsistentNaming
 namespace Nomis.SoulboundTokenService.Extensions
 {
     /// <summary>
@@ -19,39 +20,39 @@ namespace Nomis.SoulboundTokenService.Extensions
     public static class ServiceCollectionExtensions
     {
         /// <summary>
-        /// Add soulbound token service.
+        /// Add score soulbound token service.
         /// </summary>
         /// <remarks>
         /// Is EVM-compatible.
         /// </remarks>
         /// <param name="services"><see cref="IServiceCollection"/>.</param>
         /// <returns>Returns <see cref="IServiceCollection"/>.</returns>
-        internal static IServiceCollection AddEvmSoulboundTokenService(
+        internal static IServiceCollection AddEvmScoreSoulboundTokenService(
             this IServiceCollection services)
         {
             var serviceProvider = services.BuildServiceProvider();
             var configuration = serviceProvider.GetRequiredService<IConfiguration>();
-            services.AddSettings<SoulboundTokenSettings>(configuration);
+            services.AddSettings<ScoreSoulboundTokenSettings>(configuration);
             return services
-                .AddTransientInfrastructureService<IEvmSoulboundTokenService, EvmSoulboundTokenService>();
+                .AddTransientInfrastructureService<IEvmScoreSoulboundTokenService, EvmScoreSoulboundTokenService>();
         }
 
         /// <summary>
-        /// Add soulbound token service.
+        /// Add score soulbound token service.
         /// </summary>
         /// <remarks>
         /// Is not EVM-compatible.
         /// </remarks>
         /// <param name="services"><see cref="IServiceCollection"/>.</param>
         /// <returns>Returns <see cref="IServiceCollection"/>.</returns>
-        internal static IServiceCollection AddNonEvmSoulboundTokenService(
+        internal static IServiceCollection AddNonEvmScoreSoulboundTokenService(
             this IServiceCollection services)
         {
             var serviceProvider = services.BuildServiceProvider();
             var configuration = serviceProvider.GetRequiredService<IConfiguration>();
-            services.AddSettings<SoulboundTokenSettings>(configuration);
+            services.AddSettings<ScoreSoulboundTokenSettings>(configuration);
             return services
-                .AddTransientInfrastructureService<INonEvmSoulboundTokenService, NonEvmSoulboundTokenService>();
+                .AddTransientInfrastructureService<INonEvmScoreSoulboundTokenService, NonEvmScoreSoulboundTokenService>();
         }
     }
 }

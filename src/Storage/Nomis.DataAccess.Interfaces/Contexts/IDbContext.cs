@@ -7,6 +7,7 @@
 
 using System.Data;
 
+using Microsoft.EntityFrameworkCore.Infrastructure;
 using Nomis.DataAccess.Interfaces.Contracts;
 
 namespace Nomis.DataAccess.Interfaces.Contexts
@@ -17,6 +18,11 @@ namespace Nomis.DataAccess.Interfaces.Contexts
     public interface IDbContext :
         ISupportsSavingChanges
     {
+        /// <summary>
+        /// The database for the current data access database context.
+        /// </summary>
+        DatabaseFacade Database { get; }
+
         /// <summary>
         /// The database connection for the current data access database context.
         /// </summary>

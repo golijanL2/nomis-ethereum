@@ -19,6 +19,6 @@ namespace Nomis.Blockchain.Abstractions.Contracts
         /// <summary>
         /// Blockchain descriptors.
         /// </summary>
-        public IDictionary<BlockchainKind, BlockchainDescriptor> BlockchainDescriptors { get; set; }
+        public IDictionary<BlockchainKind, BlockchainDescriptor> BlockchainDescriptors { get; init; }
     }
 }

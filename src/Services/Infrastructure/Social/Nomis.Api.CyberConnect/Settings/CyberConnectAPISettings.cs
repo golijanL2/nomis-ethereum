@@ -17,7 +17,7 @@ namespace Nomis.Api.CyberConnect.Settings
         IApiSettings
     {
         /// <inheritdoc/>
-        public bool APIEnabled { get; set; }
+        public bool APIEnabled { get; init; }
 
         /// <inheritdoc/>
         public string APIName => CyberConnectController.CyberConnectTag;

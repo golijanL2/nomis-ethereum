@@ -20,14 +20,14 @@ namespace Nomis.DexProviderService.Settings
         /// <summary>
         /// Use background service for updating the cache.
         /// </summary>
-        public bool UseBackgroundCacheUpdater { get; set; }
+        public bool UseBackgroundCacheUpdater { get; init; }
 
         /// <summary>
         /// Time to the next update starting.
         /// </summary>
-        public TimeSpan Delay { get; set; }
+        public TimeSpan Delay { get; init; }
 
         /// <inheritdoc />
-        public IList<DexDescriptor>? DexDescriptors { get; set; }
+        public IList<DexDescriptor>? DexDescriptors { get; init; }
     }
 }

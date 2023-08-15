@@ -7,7 +7,7 @@
 
 using Nomis.Blockchain.Abstractions.Contracts;
 using Nomis.Blockchain.Abstractions.Enums;
-using Nomis.SoulboundTokenService.Interfaces.Contracts;
+using Nomis.Utils.Contracts.NFT;
 using Nomis.Utils.Contracts.Requests;
 using Nomis.Utils.Enums;
 
@@ -56,7 +56,7 @@ namespace Nomis.Blockchain.Abstractions.Extensions
         /// <param name="settings"><see cref="IBlockchainSettings"/>.</param>
         /// <returns>Returns soulbound token data for calculation signature.</returns>
         // ReSharper disable once InconsistentNaming
-        public static IDictionary<ScoreType, SoulboundTokenCommonData>? GetSBTData(
+        public static IDictionary<ScoreType, NFTCommonData>? GetSBTData(
             this WalletStatsRequest request,
             IBlockchainSettings settings)
         {
@@ -70,7 +70,7 @@ namespace Nomis.Blockchain.Abstractions.Extensions
         /// <param name="blockchainDescriptors">Blockchain descriptors.</param>
         /// <returns>Returns soulbound token data for calculation signature.</returns>
         // ReSharper disable once InconsistentNaming
-        public static IDictionary<ScoreType, SoulboundTokenCommonData>? GetSBTData(
+        public static IDictionary<ScoreType, NFTCommonData>? GetSBTData(
             this WalletStatsRequest request,
             IDictionary<BlockchainKind, BlockchainDescriptor> blockchainDescriptors)
         {

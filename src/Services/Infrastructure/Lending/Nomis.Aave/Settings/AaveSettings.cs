@@ -19,6 +19,6 @@ namespace Nomis.Aave.Settings
         /// <summary>
         /// List of Aave data feed.
         /// </summary>
-        public List<AaveDataFeed>? DataFeeds { get; set; }
+        public List<AaveDataFeed>? DataFeeds { get; init; }
     }
 }

@@ -7,7 +7,6 @@
 
 using System.Net.Mime;
 
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -70,7 +69,6 @@ namespace Nomis.Api.Snapshot
         /// <response code="404">No data found.</response>
         /// <response code="500">Unknown internal error.</response>
         [HttpPost("wallet/votes", Name = "GetSnapshotWalletVotes")]
-        [AllowAnonymous]
         [SwaggerOperation(
             OperationId = "GetSnapshotWalletVotes",
             Tags = new[] { SnapshotTag })]
@@ -101,7 +99,6 @@ namespace Nomis.Api.Snapshot
         /// <response code="404">No data found.</response>
         /// <response code="500">Unknown internal error.</response>
         [HttpPost("wallet/proposals", Name = "GetSnapshotWalletProposals")]
-        [AllowAnonymous]
         [SwaggerOperation(
             OperationId = "GetSnapshotWalletProposals",
             Tags = new[] { SnapshotTag })]

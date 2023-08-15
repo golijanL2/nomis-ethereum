@@ -30,8 +30,7 @@ namespace Nomis.Blockchain.Abstractions.Stats
     /// </summary>
     public class BaseEvmWalletStats<TTransactionIntervalData> :
         IWalletCommonStats<TTransactionIntervalData>,
-        IWalletNativeBalanceStats,
-        IWalletTokenBalancesStats,
+        IWalletBalanceStats,
         IWalletTransactionStats,
         IWalletTokenStats,
         IWalletContractStats,
@@ -39,7 +38,8 @@ namespace Nomis.Blockchain.Abstractions.Stats
         IWalletTallyStats,
         IWalletGreysafeStats,
         IWalletChainanalysisStats,
-        IWalletCyberConnectStats
+        IWalletCyberConnectStats,
+        IWalletCounterpartiesStats
         where TTransactionIntervalData : class, ITransactionIntervalData
     {
         /// <inheritdoc/>
@@ -65,9 +65,14 @@ namespace Nomis.Blockchain.Abstractions.Stats
         public virtual decimal NativeBalanceUSD { get; set; }
 
         /// <inheritdoc/>
+        [Display(Description = "Wallet median USD balance", GroupName = "USD")]
+        public virtual decimal HistoricalMedianBalanceUSD { get; set; }
+
+        /// <inheritdoc/>
         [Display(Description = "Wallet hold tokens total balance", GroupName = "USD")]
         [JsonPropertyOrder(-17)]
-        public virtual decimal HoldTokensBalanceUSD => TokenBalances?.Sum(b => b.TotalAmountPrice) ?? 0;
+        [JsonInclude]
+        public virtual decimal HoldTokensBalanceUSD { get; set; }
 
         /// <inheritdoc/>
         [Display(Description = "The movement of funds on the wallet", GroupName = "Native token")]
@@ -90,7 +95,7 @@ namespace Nomis.Blockchain.Abstractions.Stats
         public virtual decimal BalanceChangeInLastYear { get; set; }
 
         /// <inheritdoc/>
-        [Display(Description = "Wallet age", GroupName = "months")]
+        [Display(Description = "Wallet age (from the first transaction)", GroupName = "months")]
         [JsonPropertyOrder(-12)]
         public virtual int WalletAge { get; set; }
 
@@ -124,9 +129,9 @@ namespace Nomis.Blockchain.Abstractions.Stats
         public virtual IEnumerable<TTransactionIntervalData>? TurnoverIntervals { get; set; }
 
         /// <inheritdoc/>
-        [Display(Description = "Time since last transaction", GroupName = "months")]
+        [Display(Description = "Time since the last transaction", GroupName = "months")]
         [JsonPropertyOrder(-6)]
-        public virtual int TimeFromLastTransaction { get; set; }
+        public virtual int TimeSinceTheLastTransaction { get; set; }
 
         /// <inheritdoc/>
         [Display(Description = "Last month transactions", GroupName = "number")]
@@ -169,7 +174,7 @@ namespace Nomis.Blockchain.Abstractions.Stats
         public virtual IEnumerable<GreysafeReport>? GreysafeReports { get; set; }
 
         /// <inheritdoc/>
-        [Display(Description = "The Greysafe sanctions reports data", GroupName = "collection")]
+        [Display(Description = "The Chainanalysis sanctions reports data", GroupName = "collection")]
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public virtual IEnumerable<ChainanalysisReport>? ChainanalysisReports { get; set; }
 
@@ -198,6 +203,11 @@ namespace Nomis.Blockchain.Abstractions.Stats
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         [JsonPropertyOrder(-1)]
         public virtual IEnumerable<TokenDataBalance>? TokenBalances { get; set; }
+
+        /// <inheritdoc/>
+        [Display(Description = "Counterparties", GroupName = "collection")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public virtual IEnumerable<ExtendedCounterpartyData>? CounterpartiesData { get; set; }
 
         /// <inheritdoc/>
         [JsonPropertyOrder(int.MaxValue)]
@@ -237,7 +247,9 @@ namespace Nomis.Blockchain.Abstractions.Stats
                 nameof(CyberConnectProfile),
                 nameof(CyberConnectSubscribings),
                 nameof(CyberConnectLikes),
-                nameof(CyberConnectEssences)
+                nameof(CyberConnectEssences),
+                nameof(HistoricalMedianBalanceUSD),
+                nameof(CounterpartiesData)
             });
     }
 }

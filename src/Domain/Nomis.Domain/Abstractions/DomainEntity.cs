@@ -34,6 +34,7 @@ namespace Nomis.Domain.Abstractions
         }
 
         /// <inheritdoc cref="IEntity{TEntityId}.Id"/>
+        [JsonInclude]
         public TEntityId Id { get; private set; }
 
         /// <summary>

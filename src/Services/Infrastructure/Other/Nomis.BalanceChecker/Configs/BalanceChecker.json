@@ -96,6 +96,14 @@
         "MethodName": "getBalances",
         "RpcUrl": "https://rpc.ankr.com/avalanche",
         "BatchLimit": 50
+      },
+      {
+        "Blockchain": "Patex",
+        "ContractAddress": "",
+        "ContractAbi": "[{\"inputs\":[{\"internalType\":\"address\",\"name\":\"owner\",\"type\":\"address\"},{\"internalType\":\"address[]\",\"name\":\"addresses\",\"type\":\"address[]\"}],\"name\":\"getBalances\",\"outputs\":[{\"components\":[{\"internalType\":\"address\",\"name\":\"id\",\"type\":\"address\"},{\"internalType\":\"string\",\"name\":\"symbol\",\"type\":\"string\"},{\"internalType\":\"string\",\"name\":\"name\",\"type\":\"string\"},{\"internalType\":\"uint8\",\"name\":\"decimals\",\"type\":\"uint8\"},{\"internalType\":\"uint256\",\"name\":\"balance\",\"type\":\"uint256\"}],\"internalType\":\"struct BalanceChecker.TokenInfo[]\",\"name\":\"\",\"type\":\"tuple[]\"}],\"stateMutability\":\"view\",\"type\":\"function\"}]",
+        "MethodName": "getBalances",
+        "RpcUrl": "https://rpc.patex.io",
+        "BatchLimit": 50
       }
     ]
   }

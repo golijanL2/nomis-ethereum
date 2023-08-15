@@ -27,24 +27,72 @@ namespace Nomis.Utils.Enums
         /// Symbiosis.
         /// </summary>
         [Description("Scoring calculation model for Symbosis Finance")]
-        Symbiosis,
+        Symbiosis = 1,
 
         /// <summary>
         /// XDEFI.
         /// </summary>
         [Description("Scoring calculation model for XDEFI wallet")]
-        XDEFI,
+        XDEFI = 2,
 
         /// <summary>
         /// Halo.
         /// </summary>
         [Description("Scoring calculation model for Halo wallet")]
-        Halo,
+        Halo = 3,
 
         /// <summary>
         /// Common V2.
         /// </summary>
         [Description("Common V2 scoring calculation model")]
-        CommonV2
+        CommonV2 = 4,
+
+        /// <summary>
+        /// Rubic.
+        /// </summary>
+        [Description("Scoring calculation model for Rubic")]
+        Rubic = 5,
+
+        /// <summary>
+        /// Hedera Sybil Prevention.
+        /// </summary>
+        [Description("Hedera Sybil Prevention Scoring calculation model")]
+        HederaSybilPrevention = 6,
+
+        /// <summary>
+        /// Hedera NFT.
+        /// </summary>
+        [Description("Hedera NFT Scoring calculation model")]
+        HederaNFT = 7,
+
+        /// <summary>
+        /// Hedera DeFi.
+        /// </summary>
+        [Description("Hedera DeFi Scoring calculation model")]
+        HederaDeFi = 8,
+
+        /// <summary>
+        /// Hedera Reputation.
+        /// </summary>
+        [Description("Hedera Reputation Scoring calculation model")]
+        HederaReputation = 9,
+
+        /// <summary>
+        /// zkSync Era Reputation.
+        /// </summary>
+        [Description("zkSync Era Reputation Scoring calculation model")]
+        ZkSyncEra = 10,
+
+        /// <summary>
+        /// Common V3.
+        /// </summary>
+        [Description("Common V3 scoring calculation model")]
+        CommonV3 = 11,
+
+        /// <summary>
+        /// LayerZero (L0).
+        /// </summary>
+        [Description("LayerZero scoring calculation model")]
+        LayerZero = 12
     }
 }

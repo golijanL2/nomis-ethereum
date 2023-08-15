@@ -18,7 +18,7 @@ namespace Nomis.DeFi.Settings
         /// <summary>
         /// API key.
         /// </summary>
-        public string? ApiKey { get; set; }
+        public string? ApiKey { get; init; }
 
         /// <summary>
         /// API base URL.
@@ -26,6 +26,6 @@ namespace Nomis.DeFi.Settings
         /// <remarks>
         /// <see href="https://docs.de.fi/api/api"/>
         /// </remarks>
-        public string? ApiBaseUrl { get; set; }
+        public string? ApiBaseUrl { get; init; }
     }
 }
